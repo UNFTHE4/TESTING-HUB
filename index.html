@@ -493,19 +493,14 @@ function playHls(url, name) {
     // 2. Use HLS.js for everything (it handles .m3u8 and .ts streams)
     if (window.Hls && Hls.isSupported()) {
         hls = new Hls({
-            maxBufferLength: 60,
-            backBufferLength: 10,
-            // These headers help bypass some basic blocking
-            xhrSetup: (xhr) => {
-    // 1. Pretend to be a Smart TV
-    xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebkit/537.36 (KHTML, like Gecko) SamsungBrowser/1.0 TV Safari/537.36');
-    
-xhrSetup: (xhr) => {
-    xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebkit/537.36 (KHTML, like Gecko) SamsungBrowser/1.0 TV Safari/537.36');
-    xhr.setRequestHeader('Origin', 'https://github.com');
-    xhr.setRequestHeader('Referer', 'https://starhub.pro/');
+    maxBufferLength: 60,
+    backBufferLength: 10,
+    xhrSetup: (xhr) => {
+        xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebkit/537.36 (KHTML, like Gecko) SamsungBrowser/1.0 TV Safari/537.36');
+        xhr.setRequestHeader('Origin', 'https://github.com');
+        xhr.setRequestHeader('Referer', 'https://starhub.pro/');
     }
-        });
+    });
 
         hls.loadSource(url);
         hls.attachMedia(vid);
@@ -554,7 +549,7 @@ xhrSetup: (xhr) => {
         { name: "D SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", lang: "ENG", status: "online" },
         { name: "TNT SPORTS", url: "https://lb6.strmd.st/secure/AymMGgYAStRhorXXBoerPBHuXoGBVmoq/echo/stream/motogp-netherlands-grand-prix-game-122273/2/playlist.m3u8", lang: "ENG", status: "online" },
         { name: "TOFFEE", url: "https://sm-monirul.top/tof/live/toffee5/index.m3u8", lang: "ENG", status: "online" }, 
-        { name: "UNITE8 SPORTS 1", url: "http://starhub.pro/live/farhat-3379/67897-913379/741567.ts", lang: "SPA", status: "online" }
+        { name: "WIN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", lang: "UNK", status: "online" }
     ];
 
     const grid = document.getElementById('channel-grid');
