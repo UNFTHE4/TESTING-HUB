@@ -11,18 +11,20 @@
         :root { --mint: #00ff66; }
 
         /* Welcome Screen */
-        #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: #0b0c10; z-index: 9999; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .welcome-box { text-align: center; border: 2px solid var(--mint); padding: 40px; border-radius: 20px; }
+        #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: url("https://www.desktophut.com/files/1773918867.mp4") center/cover no-repeat; z-index: 9999; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .welcome-box { text-align: center; background: rgba(0,0,0,0.7); padding: 40px; border-radius: 20px; border: 2px solid var(--mint); }
 
-        /* Main Layout */
-        #main-content { padding: 20px; display: block; } /* Fixed: display set to block */
+        /* Layout */
+        #main-content { padding: 20px; }
+        .top-bar { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .top-bar img { height: 50px; border-radius: 8px; }
         .watch-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; max-width: 1400px; margin: 0 auto; }
         
         #video-header { background: #000; border-radius: 12px; overflow: hidden; }
         #player { width: 100%; aspect-ratio: 16/9; background: #000; }
         .controls { display: flex; align-items: center; padding: 15px; background: #1a1a1a; color: var(--mint); font-weight: bold; }
         
-        .sidebar { height: 80vh; overflow-y: auto; background: #1a1a1a; border-radius: 12px; padding: 10px; }
+        .sidebar { height: 75vh; overflow-y: auto; background: #1a1a1a; border-radius: 12px; padding: 10px; }
         .card { padding: 15px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #262626; border-left: 4px solid transparent; }
         .card:hover { background: #333; }
         .card.active { border-left-color: var(--mint); background: #333; }
@@ -34,12 +36,16 @@
 
 <div id="welcome-screen" onclick="this.style.display='none'">
     <div class="welcome-box">
-        <h1>UNF STREAM HUB</h1>
-        <p>Click to Enter</p>
+        <h1>Welcome to UNF Hub</h1>
+        <p>Click to start streaming</p>
     </div>
 </div>
 
 <div id="main-content">
+    <div class="top-bar">
+        <img src="https://i.ibb.co.com/vvCwyJG5/WC-1.png" alt="Logo">
+        <h2>UNF Stream Hub</h2>
+    </div>
     <div class="watch-container">
         <div id="video-header">
             <video id="player" controls playsinline></video>
@@ -67,6 +73,7 @@ const channels = [
     {name: "TOFFEE", url: "https://sm-monirul.top/tof/live/toffee4/index.m3u8", lang: "ENG", status: "online"},
     {name: "WIN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", lang: "UNK", status: "online"}
 ];
+
     const grid = document.getElementById('channel-grid');
     const vid = document.getElementById('player');
     let hls = null;
@@ -87,11 +94,11 @@ const channels = [
     async function playStream(url) {
         if (hls) { hls.destroy(); hls = null; }
         if (window.shakaPlayer) { await window.shakaPlayer.destroy(); }
-
         if (url.includes('.mpd')) {
             const player = new shaka.Player(vid);
             window.shakaPlayer = player;
-            try { await player.load(url); vid.play(); } catch(e) { console.error(e); }
+            await player.load(url);
+            vid.play();
         } else {
             hls = new Hls();
             hls.loadSource(url);
@@ -100,6 +107,5 @@ const channels = [
         }
     }
 </script>
-
 </body>
 </html>
