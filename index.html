@@ -497,8 +497,14 @@ function playHls(url, name) {
             backBufferLength: 10,
             // These headers help bypass some basic blocking
             xhrSetup: (xhr) => {
-                xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)');
-            }
+    // 1. Pretend to be a Smart TV
+    xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebkit/537.36 (KHTML, like Gecko) SamsungBrowser/1.0 TV Safari/537.36');
+    
+    // 2. Add these headers to bypass common security blocks
+    xhr.setRequestHeader('Accept', '*/*');
+    xhr.setRequestHeader('Origin', 'https://github.com');
+    xhr.setRequestHeader('Referer', 'https://starhub.pro/');
+        }
         });
 
         hls.loadSource(url);
@@ -541,14 +547,14 @@ function playHls(url, name) {
         { name: "ESPN", url: "https://1nyaler.streamhostingcdn.top/stream/97/index.m3u8", lang: "DUT", status: "offline" }, 
         { name: "beIN SPORTS 1", url: "https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8", lang: "FRE", status: "online" },
         { name: "beIN SPORTS XTRA", url: "https://bein-esp-xumo.amagi.tv/playlistR1080p.m3u8", lang: "UNK", status: "online" },
-        { name: "DAZN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/52/index.m3u8", lang: "SPA", status: "online" },
+        { name: "DAZN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8", lang: "SPA", status: "online" },
         { name: "DAZN F1", url: "https://tv.topmediatv.net:25463/live/TopMediaWeb/bOteTR8ED1/374.m3u8", lang: "SPA", status: "online" },
         { name: "FOX SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/26/index.m3u8", lang: "ENG", status: "online" },
         { name: "FOX", url: "https://d1jzu95oc8fgt3.cloudfront.net/FOX_Sports720p.m3u8", lang: "ENG", status: "online" },
         { name: "D SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", lang: "ENG", status: "online" },
-        { name: "TSN", url: "https://tvsen7.aynaott.com/tsn1/index.m3u8", lang: "ENG", status: "online" },
+        { name: "TNT SPORTS", url: "https://lb6.strmd.st/secure/AymMGgYAStRhorXXBoerPBHuXoGBVmoq/echo/stream/motogp-netherlands-grand-prix-game-122273/2/playlist.m3u8", lang: "ENG", status: "online" },
         { name: "TOFFEE", url: "https://sm-monirul.top/tof/live/toffee5/index.m3u8", lang: "ENG", status: "online" }, 
-        { name: "UNITE8 SPORTS 2", url: "https://s1.itcnbd.live/united-sports-2/index.m3u8", lang: "SPA", status: "online" }
+        { name: "UNITE8 SPORTS 1", url: "http://starhub.pro/live/farhat-3379/67897-913379/741567.ts", lang: "SPA", status: "online" }
     ];
 
     const grid = document.getElementById('channel-grid');
