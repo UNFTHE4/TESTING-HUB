@@ -500,11 +500,11 @@ function playHls(url, name) {
     // 1. Pretend to be a Smart TV
     xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebkit/537.36 (KHTML, like Gecko) SamsungBrowser/1.0 TV Safari/537.36');
     
-    // 2. Add these headers to bypass common security blocks
-    xhr.setRequestHeader('Accept', '*/*');
+xhrSetup: (xhr) => {
+    xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebkit/537.36 (KHTML, like Gecko) SamsungBrowser/1.0 TV Safari/537.36');
     xhr.setRequestHeader('Origin', 'https://github.com');
     xhr.setRequestHeader('Referer', 'https://starhub.pro/');
-        }
+    }
         });
 
         hls.loadSource(url);
