@@ -479,7 +479,14 @@
         document.getElementById('vol-icon').className = vid.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-up';
     }
 
-    function playHls(url, name) {
+function playHls(url, name) {
+        // === NEW: Support direct .ts files ===
+        if (url.endsWith('.ts') || url.includes('.ts?')) {
+            vid.src = url;
+            vid.play();
+            return;
+        }
+
         if (hls) {
             hls.destroy();
             hls = null;
@@ -534,7 +541,7 @@
             }, 5000);
         }
     }
-
+    
     // ===== CHANNELS =====
     const channels = [
         { name: "T SPORTS", url: "https://tv.emnetbd.com/flussonic/Tsports1/tracks-v1a1/mono.m3u8", lang: "BAN/ENG", status: "online" },
