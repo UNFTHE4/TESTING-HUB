@@ -2,232 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="robots" content="noindex, nofollow">
-    <title>UNF STREAM HUB</title>
-    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="icon" type="image/webp" href="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
+    <title>UNF Stream Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
     <style>
-/* ===== YOUTUBE-STYLE LAYOUT ===== */
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background:#0f0f0f; font-family: Roboto, Arial, sans-serif; color:#fff; }
-:root { --mint: #00ff66; }
-
-#main-content { display: none; padding: 20px; }
-
-/* Main Video Layout */
-.watch-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; max-width: 1400px; margin: 0 auto; }
-
-/* Left Side: Video */
-#video-header { background: #000; border-radius: 12px; overflow: hidden; }
-#player { width: 100%; aspect-ratio: 16/9; background: #000; }
-.controls { display: flex; align-items: center; padding: 15px; background: #1a1a1a; gap: 15px; }
-
-/* Right Side: Sidebar Channels */
-.sidebar { height: 80vh; overflow-y: auto; background: #1a1a1a; border-radius: 12px; padding: 10px; }
-.card { padding: 10px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; }
-.card:hover { background: #333; }
-.card.active { background: #262626; border-left: 4px solid var(--mint); }
-
-/* Responsive: Stack on mobile */
-@media (max-width: 900px) {
-    .watch-container { grid-template-columns: 1fr; }
-    .sidebar { height: auto; }
-}
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:#0f0f0f; font-family: Roboto, Arial, sans-serif; color:#fff; }
+        :root { --mint: #00ff66; }
+        
+        #main-content { padding: 20px; }
+        .watch-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; max-width: 1400px; margin: 0 auto; }
+        
+        #video-header { background: #000; border-radius: 12px; overflow: hidden; }
+        #player { width: 100%; aspect-ratio: 16/9; background: #000; }
+        .controls { display: flex; align-items: center; padding: 15px; background: #1a1a1a; color: var(--mint); font-weight: bold; }
+        
+        .sidebar { height: 80vh; overflow-y: auto; background: #1a1a1a; border-radius: 12px; padding: 10px; }
+        .card { padding: 15px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; background: #262626; border-left: 4px solid transparent; }
+        .card:hover { background: #333; }
+        .card.active { border-left-color: var(--mint); background: #333; }
+        
+        @media (max-width: 900px) { .watch-container { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-<!-- ===== WELCOME SCREEN ===== -->
-<div id="welcome-screen">
-    <div class="welcome-box">
-        <img class="logo-img" src="https://i.ibb.co.com/Df6zYZTZ/Adobe-Express-file.png" alt="UNF Logo">
-        <h1>UNF STREAM HUB</h1>
-        <p>United NTLA of Flario<br><span style="color:#667;font-size:0.75rem;">Enter 4-digit passcode</span></p>
-        <input id="passcode-input" type="password" maxlength="4" placeholder="****" inputmode="numeric" autofocus>
-        <div id="login-error">❌ Incorrect passcode!</div>
-        <div class="login-footer">For citizens of Flario only</div>
-    </div>
-</div>
-
-<!-- ===== MAIN CONTENT ===== -->
 <div id="main-content">
     <div class="watch-container">
         <div id="video-header">
             <video id="player" controls playsinline></video>
             <div class="controls">
                 <span id="status-text">SELECT CHANNEL</span>
-                <i class="fa-solid fa-sliders" onclick="togglePanel()"></i>
             </div>
-            <div id="adjust-panel">
-                </div>
         </div>
         <div class="sidebar" id="channel-grid"></div>
     </div>
 </div>
-    <!-- TOP BAR -->
-    <div class="top-bar">
-        <div class="logo">
-            <img src="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp" alt="UNF Logo">
-            <span>UNF</span>
-        </div>
-        <div class="right">
-            <i class="fa-solid fa-bars" onclick="toggleMenu()" style="cursor:pointer; font-size:1.4rem; color:var(--mint);"></i>
-            <div id="digital-clock">00:00 AM</div>
-        </div>
-    </div>
-
-    <!-- MENU DROPDOWN -->
-    <div id="menu-dropdown">
-        <div onclick="playMovie()">🎬 Movie Player</div>
-        <div onclick="openRequestMovie()">🎞️ Request Movie</div>
-        <div onclick="reportError()">🚨 Report Error</div>
-    </div>
-
-    <!-- VIDEO HEADER -->
-    <div id="video-header">
-        <div id="status-overlay">
-            <img id="buffer-gif" src="https://media4.giphy.com/media/aBW9YyswmydvlKf7ZU/giphy.gif">
-            <div id="error-msg">IF STREAM IS NOT WORKING PLEASE REPORT AND LET US KNOW</div>
-        </div>
-        <video id="player" playsinline></video>
-        <div class="controls">
-            <div class="left">
-                <i class="fa-solid fa-play" onclick="vid.play()"></i>
-            </div>
-            <span id="status-text">SELECT CHANNEL</span>
-            <div class="right">
-                <i class="fa-solid fa-sliders" onclick="togglePanel()"></i>
-                <i class="fa-solid fa-volume-up" id="vol-icon" onclick="toggleMute()"></i>
-                <i class="fa-solid fa-expand" onclick="goFullscreen()"></i>
-            </div>
-        </div>
-        <div id="adjust-panel">
-            <div>Saturation: <input max="200" min="0" oninput="applyFilter()" type="range" value="100"></div>
-            <div>Contrast: <input max="150" min="50" oninput="applyFilter()" type="range" value="100"></div>
-            <div>Sharpness: <input max="100" min="0" oninput="applyFilter()" type="range" value="0"></div>
-        </div>
-        <div class="grid" id="channel-grid"></div>
-    </div>
-
-    <!-- FOOTER -->
-    <div class="footer">
-        All RIGHTS OF THIS SITE OWN BY UNF STREAM HUB SERVICE. ITS USE TO BROADCAST ALL PUBLICALLY AVAILABLE STREAM WE FOUND ONLINE ©
-    </div>
-</div>
-
-<!-- ===== REQUEST MOVIE OVERLAY ===== -->
-<div id="request-overlay">
-    <div class="request-box">
-        <h2>🎞️ Request a Movie</h2>
-        <p>Enter the name of the movie you want to watch</p>
-        <input id="movie-title" type="text" placeholder="Movie Title">
-        <button onclick="saveMovieRequest()">✅ Request Movie</button>
-        <button class="cancel-btn" onclick="document.getElementById('request-overlay').style.display='none'">Cancel</button>
-        <div id="request-status"></div>
-    </div>
-</div>
 
 <script>
-    // ===== PASSCODE =====
-    function checkCode(val) {
-        if (val === "6767") {
-            document.getElementById('welcome-screen').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-            document.getElementById('login-error').style.display = 'none';
-        } else if (val.length === 4) {
-            document.getElementById('login-error').style.display = 'block';
-            document.getElementById('passcode-input').value = '';
-        }
-    }
-
-    document.getElementById('passcode-input').addEventListener('input', function() {
-        checkCode(this.value);
-    });
-
-    // ===== VIDEO PLAYER =====
-    const vid = document.getElementById('player');
-    const s = document.querySelectorAll('#adjust-panel input');
-    let hls = null;
-    let tsnTimer = null;
-
-    function goFullscreen() {
-        if (vid.requestFullscreen) vid.requestFullscreen();
-    }
-
-    function applyFilter() {
-        vid.style.filter = `saturate(${s[0].value}%) contrast(${s[1].value}%) blur(${s[2].value/50}px)`;
-    }
-
-    function togglePanel() {
-        const p = document.getElementById('adjust-panel');
-        p.style.display = (p.style.display === 'block') ? 'none' : 'block';
-    }
-
-    function toggleMute() {
-        vid.muted = !vid.muted;
-        document.getElementById('vol-icon').className = vid.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-up';
-    }
-
-function playHls(url, name) {
-    // 1. Cleanup existing player
-    if (hls) {
-        hls.destroy();
-        hls = null;
-    }
-    if (tsnTimer) {
-        clearInterval(tsnTimer);
-        tsnTimer = null;
-    }
-
-    // 2. Use HLS.js for everything (it handles .m3u8 and .ts streams)
-    if (window.Hls && Hls.isSupported()) {
-        hls = new Hls({
-    maxBufferLength: 60,
-    backBufferLength: 10,
-    xhrSetup: (xhr) => {
-        xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebkit/537.36 (KHTML, like Gecko) SamsungBrowser/1.0 TV Safari/537.36');
-        xhr.setRequestHeader('Origin', 'https://github.com');
-        xhr.setRequestHeader('Referer', 'https://starhub.pro/');
-    }
-    });
-
-        hls.loadSource(url);
-        hls.attachMedia(vid);
-        
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            vid.play().catch(e => console.log("Autoplay blocked, user must click play."));
-        });
-
-        hls.on(Hls.Events.ERROR, function (event, data) {
-            if (data.fatal) {
-                console.error("Fatal HLS error:", data);
-                hls.destroy();
-            }
-        });
-    } 
-    // 3. Fallback for native Safari/Mobile support
-    else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
-        vid.src = url;
-        vid.play();
-    }
-
-    // Special D SPORTS rotation
-    if (name === "D SPORTS") {
-        const links = ["https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", "https://fl1004.bozztv.com/ushba-mafia/tracks-v1a1/mono.m3u8"];
-        tsnTimer = setInterval(() => {
-            const activeIndex = Math.floor(Date.now() / 180000) % links.length;
-            if (hls && hls.url !== links[activeIndex]) {
-                hls.loadSource(links[activeIndex]);
-                vid.play();
-            }
-        }, 5000);
-    }
-}
-    
-// ===== CHANNELS ===== 
 const channels = [
     {name: "T SPORTS", url: "https://tv.emnetbd.com/flussonic/Tsports1/tracks-v1a1/mono.m3u8", lang: "BAN/ENG", status: "online"},
     {name: "SKY SPORTS F1", url: "https://xstm.250909.cc/live/SPORTSFLUX-POOL-20acb0a9c8/5ffe6c552a88/1037.m3u8", lang: "ENG", status: "online"},
@@ -244,98 +56,39 @@ const channels = [
     {name: "WIN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", lang: "UNK", status: "online"}
 ];
 
-const grid = document.getElementById('channel-grid');
-channels.forEach(c => {
-    let card = document.createElement('div');
-    card.className = `card ${c.status}`;
-    card.innerHTML = `<div style="font-weight:bold;">${c.name}</div>
-                      <div style="font-size:0.7rem; color:#ccc;">${c.lang}</div>
-                      <div class="${c.status}-text">${c.status.toUpperCase()}</div>`;
-    card.onclick = () => {
-        if (c.status === "online" && c.url) {
+    const grid = document.getElementById('channel-grid');
+    const vid = document.getElementById('player');
+    let hls = null;
+
+    channels.forEach(c => {
+        let card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<strong>${c.name}</strong><br><small>${c.lang}</small>`;
+        card.onclick = () => {
             document.querySelectorAll('.card').forEach(el => el.classList.remove('active'));
             card.classList.add('active');
             document.getElementById('status-text').innerText = c.name;
-            playHls(c.url, c.name);
-        }
-    };
-    grid.appendChild(card);
-});
-
-// ===== VIDEO EVENTS =====
-const vid = document.getElementById('player');
-vid.addEventListener('waiting', () => console.log("Buffering..."));
-vid.addEventListener('playing', () => console.log("Playing"));
-    // ===== DIGITAL CLOCK =====
-    function updateClock() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
-        document.getElementById('digital-clock').innerText = timeString;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // ===== MENU FUNCTIONS =====
-    function toggleMenu() {
-        const menu = document.getElementById('menu-dropdown');
-        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-    }
-
-    // ===== MOVIE SYSTEM =====
-const movieList = [
-    { name: "THE MOVIE", url: "https://www.ftpbd.net/wp-content/hls-file/Spider-Man-2002-1080p-Hindi-Dubbed-BluRay_reencoded/index.m3u8" }
-];
-
-    function playMovie() {
-        document.getElementById('menu-dropdown').style.display = 'none';
-        if (movieList.length === 0) {
-            alert("🎬 No movie has been added by the admin yet. Check back later!");
-            return;
-        }
-        // Play the first movie in the list (or you can let users choose later)
-        const movie = movieList[0];
-        document.getElementById('status-text').innerText = `🎬 ${movie.name}`;
-        playHls(movie.url, movie.name);
-    }
-
-    function openRequestMovie() {
-        document.getElementById('menu-dropdown').style.display = 'none';
-        document.getElementById('request-overlay').style.display = 'flex';
-    }
-
-    function saveMovieRequest() {
-    const title = document.getElementById('movie-title').value.trim();
-    if (!title) return;
-
-    const email = "UNF.INT@proton.me";
-    const subject = encodeURIComponent("New Movie Request");
-    const body = encodeURIComponent("I would like to request the movie: " + title);
-    
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-    
-    document.getElementById('request-overlay').style.display = 'none';
-    }
-    
-    function reportError() {
-        document.getElementById('menu-dropdown').style.display = 'none';
-        const email = 'UNF.INT@proton.me'; // 🔁 Replace with your email
-        const subject = encodeURIComponent('UNF Hub - Error Report');
-        const body = encodeURIComponent('Please describe the error you encountered:\n\n');
-        window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
-    }
-
-    // Close menu when clicking outside
-    document.addEventListener('click', function(e) {
-        const menu = document.getElementById('menu-dropdown');
-        const icon = document.querySelector('.fa-bars');
-        if (menu.style.display === 'block' && !menu.contains(e.target) && !icon.contains(e.target)) {
-            menu.style.display = 'none';
-        }
+            playStream(c.url);
+        };
+        grid.appendChild(card);
     });
+
+    async function playStream(url) {
+        if (hls) { hls.destroy(); hls = null; }
+        if (window.shakaPlayer) { await window.shakaPlayer.destroy(); }
+
+        if (url.includes('.mpd')) {
+            const player = new shaka.Player(vid);
+            window.shakaPlayer = player;
+            await player.load(url);
+            vid.play();
+        } else {
+            hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(vid);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
+        }
+    }
 </script>
 
 </body>
