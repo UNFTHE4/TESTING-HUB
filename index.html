@@ -8,302 +8,34 @@
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/webp" href="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
     <style>
-/* ===== RESET ===== */
+/* ===== YOUTUBE-STYLE LAYOUT ===== */
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#0b0c10; font-family:sans-serif; color:#fff; overflow-x:hidden; min-height:100vh; }
-:root { --mint: #00ff66; --panel: #11141a; --red: #ff4757; }
+body { background:#0f0f0f; font-family: Roboto, Arial, sans-serif; color:#fff; }
+:root { --mint: #00ff66; }
 
-/* ===== WELCOME SCREEN ===== */
-#welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: url("https://i.ibb.co.com/vvCwyJG5/WC-1.png") center/cover no-repeat; background-color: #0b0c10; z-index: 9999; display: flex; justify-content: center; align-items: center; }
-.welcome-box { background: linear-gradient(135deg, #000, #00ff6611); padding: 40px 30px; border: 2px solid var(--mint); border-radius: 20px; text-align: center; max-width: 400px; width: 90%; }
-.logo-img { width: 120px; height: auto; margin-bottom: 15px; border-radius: 10px; }
-.welcome-box h1 { color: var(--mint); font-size: 1.8rem; margin-bottom: 5px; }
+#main-content { display: none; padding: 20px; }
 
-/* Main Container */
-#main-content { max-width: 1000px; margin: 0 auto; padding: 20px; display: none; }
+/* Main Video Layout */
+.watch-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; max-width: 1400px; margin: 0 auto; }
 
-/* Top Bar */
-.top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); border-bottom: 2px solid var(--mint); }
-.top-bar .logo { display: flex; align-items: center; gap: 10px; }
-.top-bar .logo img { height: 40px; width: auto; border-radius: 6px; }
-.top-bar .logo span { color: var(--mint); font-weight: bold; font-size: 1.2rem; }
+/* Left Side: Video */
+#video-header { background: #000; border-radius: 12px; overflow: hidden; }
+#player { width: 100%; aspect-ratio: 16/9; background: #000; }
+.controls { display: flex; align-items: center; padding: 15px; background: #1a1a1a; gap: 15px; }
 
-/* Video Player Header */
-#video-header { background: #000; border-radius: 12px; overflow: hidden; border: 1px solid #222; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-.controls { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: rgba(0,0,0,0.8); color: var(--mint); }
-.controls i { cursor: pointer; font-size: 1.2rem; transition: 0.2s; padding: 5px; }
-.controls i:hover { color: #fff; }
+/* Right Side: Sidebar Channels */
+.sidebar { height: 80vh; overflow-y: auto; background: #1a1a1a; border-radius: 12px; padding: 10px; }
+.card { padding: 10px; margin-bottom: 8px; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; }
+.card:hover { background: #333; }
+.card.active { background: #262626; border-left: 4px solid var(--mint); }
 
-/* Grid */
-.grid { display: grid; gap: 10px; padding: 15px 0; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-.card { background: var(--panel); padding: 15px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; text-align: center; transition: 0.2s; }
-.card:hover { border-color: var(--mint); background: #161b22; }
-.card.active { border-color: var(--mint); background: #1a2a3a; }
-
-/* Adjust Panel */
-#adjust-panel { position: relative; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; display: none; margin-top: 10px; }
-#adjust-panel input { width: 100%; margin-top: 5px; }
-        
-        /* ===== TOP BAR (LOGO + CLOCK + MENU) ===== */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px);
-            border-bottom: 2px solid var(--mint);
-        }
-        .top-bar .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .top-bar .logo img {
-            height: 40px;
-            width: auto;
-            border-radius: 6px;
-        }
-        .top-bar .logo span {
-            color: var(--mint);
-            font-weight: bold;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-        }
-        .top-bar .right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        #digital-clock {
-            color: var(--mint);
-            font-family: monospace;
-            font-size: 1rem;
-            background: rgba(0,0,0,0.5);
-            padding: 4px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--mint);
-        }
-        @media (max-width: 899px) {
-            #digital-clock { display: none; }
-        }
-
-        /* ===== MENU DROPDOWN ===== */
-        #menu-dropdown {
-            display: none;
-            position: absolute;
-            top: 70px;
-            right: 15px;
-            background: #11141a;
-            border: 1px solid var(--mint);
-            border-radius: 12px;
-            padding: 10px 0;
-            width: 180px;
-            z-index: 2000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-        }
-        #menu-dropdown div {
-            padding: 12px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid #222;
-            color: #fff;
-            transition: 0.2s;
-        }
-        #menu-dropdown div:hover {
-            background: rgba(0, 255, 102, 0.1);
-            color: var(--mint);
-        }
-        #menu-dropdown div:last-child {
-            border-bottom: none;
-        }
-        #menu-dropdown div:last-child:hover {
-            background: rgba(255, 71, 87, 0.1);
-            color: var(--red);
-        }
-
-        /* ===== CONTROLS ===== */
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            background: rgba(0,0,0,0.8);
-            color: var(--mint);
-        }
-        .controls i {
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: 0.2s;
-        }
-        .controls i:hover { color: #fff; }
-        .controls .left, .controls .right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        #status-text {
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        /* ===== OVERLAYS ===== */
-        #status-overlay {
-            position: absolute;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 99;
-            pointer-events: none;
-            text-align: center;
-        }
-        #buffer-gif {
-            display: none;
-            width: 60px;
-        }
-        #error-msg {
-            display: none;
-            color: white;
-            background: rgba(0,0,0,0.8);
-            padding: 10px 20px;
-            border-radius: 8px;
-        }
-
-        /* ===== GRID ===== */
-        .grid {
-            display: grid;
-            gap: 10px;
-            padding: 15px 0;
-        }
-        .card {
-            background: var(--panel);
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            color: #fff;
-            transition: all 0.2s ease;
-        }
-        .card.active {
-            border-color: var(--mint);
-            background: #1a2a3a;
-            box-shadow: 0 0 15px rgba(0,255,102,0.3);
-            transform: scale(1.02);
-        }
-        .card.offline {
-            opacity: 0.5;
-            filter: grayscale(1);
-        }
-        .card.starting-soon {
-            opacity: 0.7;
-            border-color: #ffaa00;
-        }
-        .online-text { color: var(--mint); font-weight: bold; }
-        .offline-text { color: var(--red); font-weight: bold; }
-        .starting-soon-text { color: #ffaa00; font-weight: bold; }
-
-        @media (max-width: 899px) {
-            .grid { grid-template-columns: 1fr 1fr; }
-        }
-        @media (min-width: 900px) {
-            .grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        /* ===== ADJUST PANEL ===== */
-        #adjust-panel {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
-            max-width: 500px;
-            margin: 0 auto;
-            background: #111;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--mint);
-            display: none;
-            z-index: 1000;
-        }
-        #adjust-panel div {
-            margin-bottom: 10px;
-        }
-        #adjust-panel input {
-            width: 100%;
-        }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            text-align: center;
-            font-size: 11px;
-            color: #666;
-            padding: 30px 10px;
-            margin-top: 20px;
-            border-top: 1px solid #222;
-        }
-
-        /* ===== REQUEST MOVIE OVERLAY ===== */
-        #request-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 9998;
-            justify-content: center;
-            align-items: center;
-        }
-        .request-box {
-            background: #11141a;
-            padding: 30px;
-            border-radius: 20px;
-            border: 2px solid var(--mint);
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-        .request-box h2 {
-            color: var(--mint);
-            margin-bottom: 10px;
-        }
-        .request-box p {
-            color: #889;
-            margin-bottom: 15px;
-        }
-        .request-box input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background: #0b0c10;
-            color: #fff;
-        }
-        .request-box button {
-            width: 100%;
-            padding: 12px;
-            background: var(--mint);
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .request-box button:hover {
-            background: #00dd55;
-        }
-        .request-box .cancel-btn {
-            margin-top: 10px;
-            background: transparent;
-            border: 1px solid #555;
-            color: #889;
-        }
-        .request-box .cancel-btn:hover {
-            background: #222;
-        }
-        #request-status {
-            margin-top: 10px;
-            font-weight: bold;
-        }
+/* Responsive: Stack on mobile */
+@media (max-width: 900px) {
+    .watch-container { grid-template-columns: 1fr; }
+    .sidebar { height: auto; }
+}
     </style>
 </head>
 <body>
@@ -322,7 +54,19 @@ body { background:#0b0c10; font-family:sans-serif; color:#fff; overflow-x:hidden
 
 <!-- ===== MAIN CONTENT ===== -->
 <div id="main-content">
-
+    <div class="watch-container">
+        <div id="video-header">
+            <video id="player" controls playsinline></video>
+            <div class="controls">
+                <span id="status-text">SELECT CHANNEL</span>
+                <i class="fa-solid fa-sliders" onclick="togglePanel()"></i>
+            </div>
+            <div id="adjust-panel">
+                </div>
+        </div>
+        <div class="sidebar" id="channel-grid"></div>
+    </div>
+</div>
     <!-- TOP BAR -->
     <div class="top-bar">
         <div class="logo">
@@ -483,51 +227,45 @@ function playHls(url, name) {
     }
 }
     
-    // ===== CHANNELS =====
-    const channels = [
-        { name: "T SPORTS", url: "https://tv.emnetbd.com/flussonic/Tsports1/tracks-v1a1/mono.m3u8", lang: "BAN/ENG", status: "online" },
-        { name: "SKY SPORTS F1", url: "https://xstm.250909.cc/live/SPORTSFLUX-POOL-20acb0a9c8/5ffe6c552a88/1037.m3u8", lang: "ENG", status: "online" },
-        { name: "ESPN", url: "https://1nyaler.streamhostingcdn.top/stream/97/index.m3u8", lang: "DUT", status: "offline" }, 
-        { name: "beIN SPORTS 1", url: "https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8", lang: "FRE", status: "online" },
-        { name: "beIN SPORTS XTRA", url: "https://bein-esp-xumo.amagi.tv/playlistR1080p.m3u8", lang: "UNK", status: "online" },
-        { name: "DAZN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8", lang: "SPA", status: "online" },
-        { name: "DAZN F1", url: "https://tv.topmediatv.net:25463/live/TopMediaWeb/bOteTR8ED1/374.m3u8", lang: "SPA", status: "online" },
-        { name: "FOX SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/26/index.m3u8", lang: "ENG", status: "online" },
-        { name: "FOX", url: "https://d1jzu95oc8fgt3.cloudfront.net/FOX_Sports720p.m3u8", lang: "ENG", status: "online" },
-        { name: "D SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", lang: "ENG", status: "online" },
-        { name: "TNT SPORTS", url: "https://lb6.strmd.st/secure/AymMGgYAStRhorXXBoerPBHuXoGBVmoq/echo/stream/motogp-netherlands-grand-prix-game-122273/2/playlist.m3u8", lang: "ENG", status: "online" },
-        { name: "TOFFEE", url: "https://sm-monirul.top/tof/live/toffee4/index.m3u8", lang: "ENG", status: "online" }, 
-        { name: "WIN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", lang: "UNK", status: "online" }
-    ];
+// ===== CHANNELS ===== 
+const channels = [
+    {name: "T SPORTS", url: "https://tv.emnetbd.com/flussonic/Tsports1/tracks-v1a1/mono.m3u8", lang: "BAN/ENG", status: "online"},
+    {name: "SKY SPORTS F1", url: "https://xstm.250909.cc/live/SPORTSFLUX-POOL-20acb0a9c8/5ffe6c552a88/1037.m3u8", lang: "ENG", status: "online"},
+    {name: "ESPN", url: "https://1nyaler.streamhostingcdn.top/stream/97/index.m3u8", lang: "DUT", status: "offline"},
+    {name: "beIN SPORTS 1", url: "https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8", lang: "FRE", status: "online"},
+    {name: "beIN SPORTS XTRA", url: "https://bein-esp-xumo.amagi.tv/playlistR1080p.m3u8", lang: "UNK", status: "online"},
+    {name: "DAZN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8", lang: "SPA", status: "online"},
+    {name: "DAZN F1", url: "https://tv.topmediatv.net:25463/live/TopMediaWeb/bOteTR8ED1/374.m3u8", lang: "SPA", status: "online"},
+    {name: "FOX SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/26/index.m3u8", lang: "ENG", status: "online"},
+    {name: "FOX", url: "https://d1jzu95oc8fgt3.cloudfront.net/FOX_Sports720p.m3u8", lang: "ENG", status: "online"},
+    {name: "TSN", url: "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/w0rehjjrwe/out/v1/69a2a7041395406b970598f61680e7cf/cenc.mpd", lang: "ENG", status: "online"},
+    {name: "D SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", lang: "ENG", status: "online"},
+    {name: "TOFFEE", url: "https://sm-monirul.top/tof/live/toffee4/index.m3u8", lang: "ENG", status: "online"},
+    {name: "WIN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", lang: "UNK", status: "online"}
+];
 
-    const grid = document.getElementById('channel-grid');
-    channels.forEach(c => {
-        let card = document.createElement('div');
-        card.className = `card ${c.status}`;
-        card.innerHTML = `
-            <div style="font-weight:bold;">${c.name}</div>
-            <div style="font-size:0.7rem; color:#ccc;">${c.lang}</div>
-            <div class="${c.status}-text">${c.status.toUpperCase()}</div>
-        `;
-        card.onclick = () => {
-            if (c.status === "online" && c.url) {
-                document.querySelectorAll('.card').forEach(el => el.classList.remove('active'));
-                card.classList.add('active');
-                document.getElementById('status-text').innerText = c.name;
-                playHls(c.url, c.name);
-            }
-        };
-        grid.appendChild(card);
-    });
+const grid = document.getElementById('channel-grid');
+channels.forEach(c => {
+    let card = document.createElement('div');
+    card.className = `card ${c.status}`;
+    card.innerHTML = `<div style="font-weight:bold;">${c.name}</div>
+                      <div style="font-size:0.7rem; color:#ccc;">${c.lang}</div>
+                      <div class="${c.status}-text">${c.status.toUpperCase()}</div>`;
+    card.onclick = () => {
+        if (c.status === "online" && c.url) {
+            document.querySelectorAll('.card').forEach(el => el.classList.remove('active'));
+            card.classList.add('active');
+            document.getElementById('status-text').innerText = c.name;
+            playHls(c.url, c.name);
+        }
+    };
+    grid.appendChild(card);
+});
 
-    // ===== VIDEO EVENTS =====
-    const gif = document.getElementById('buffer-gif');
-    const err = document.getElementById('error-msg');
-
-    vid.addEventListener('waiting', () => { gif.style.display = 'block'; });
-    vid.addEventListener('playing', () => { gif.style.display = 'none'; err.style.display = 'none'; });
-    vid.addEventListener('error', () => { gif.style.display = 'none'; err.style.display = 'block'; });
-
+// ===== VIDEO EVENTS =====
+const vid = document.getElementById('player');
+vid.addEventListener('waiting', () => console.log("Buffering..."));
+vid.addEventListener('playing', () => console.log("Playing"));
     // ===== DIGITAL CLOCK =====
     function updateClock() {
         const now = new Date();
