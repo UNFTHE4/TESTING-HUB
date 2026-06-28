@@ -480,67 +480,59 @@
     }
 
 function playHls(url, name) {
-        // === NEW: Support direct .ts files ===
-        if (url.endsWith('.ts') || url.includes('.ts?')) {
-            vid.src = url;
-            vid.play();
-            return;
-        }
-
-        if (hls) {
-            hls.destroy();
-            hls = null;
-        }
-        if (tsnTimer) {
-            clearInterval(tsnTimer);
-            tsnTimer = null;
-        }
-
-        if (window.Hls && Hls.isSupported()) {
-            hls = new Hls({
-                maxBufferLength: 60,
-                backBufferLength: 10,
-                xhrSetup: (xhr) => { xhr.setRequestHeader('User-Agent', 'Mozilla/5.0'); }
-            });
-            hls.loadSource(url);
-            hls.attachMedia(vid);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                vid.play();
-            });
-            hls.on(Hls.Events.ERROR, function (event, data) {
-                if (data.fatal) {
-                    switch (data.type) {
-                        case Hls.ErrorTypes.NETWORK_ERROR:
-                            hls.startLoad();
-                            break;
-                        default:
-                            hls.destroy();
-                            break;
-                    }
-                }
-            });
-        } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
-            vid.src = url;
-            vid.play();
-        }
-
-        // Special D SPORTS rotation
-        if (name === "D SPORTS") {
-            const links = [
-                "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8",
-                "https://fl1004.bozztv.com/ushba-mafia/tracks-v1a1/mono.m3u8"
-            ];
-            const interval = 180000;
-            tsnTimer = setInterval(() => {
-                const activeIndex = Math.floor(Date.now() / interval) % links.length;
-                if (hls && hls.url !== links[activeIndex]) {
-                    hls.loadSource(links[activeIndex]);
-                    hls.currentLevel = hls.levels.length - 1;
-                    vid.play();
-                }
-            }, 5000);
-        }
+    // 1. Cleanup existing player
+    if (hls) {
+        hls.destroy();
+        hls = null;
     }
+    if (tsnTimer) {
+        clearInterval(tsnTimer);
+        tsnTimer = null;
+    }
+
+    // 2. Use HLS.js for everything (it handles .m3u8 and .ts streams)
+    if (window.Hls && Hls.isSupported()) {
+        hls = new Hls({
+            maxBufferLength: 60,
+            backBufferLength: 10,
+            // These headers help bypass some basic blocking
+            xhrSetup: (xhr) => {
+                xhr.setRequestHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)');
+            }
+        });
+
+        hls.loadSource(url);
+        hls.attachMedia(vid);
+        
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            vid.play().catch(e => console.log("Autoplay blocked, user must click play."));
+        });
+
+        hls.on(Hls.Events.ERROR, function (event, data) {
+            if (data.fatal) {
+                console.error("Fatal HLS error:", data);
+                hls.destroy();
+            }
+        });
+    } 
+    // 3. Fallback for native Safari/Mobile support
+    else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+        vid.src = url;
+        vid.play();
+    }
+
+    // Special D SPORTS rotation
+    if (name === "D SPORTS") {
+        const links = ["https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", "https://fl1004.bozztv.com/ushba-mafia/tracks-v1a1/mono.m3u8"];
+        tsnTimer = setInterval(() => {
+            const activeIndex = Math.floor(Date.now() / 180000) % links.length;
+            if (hls && hls.url !== links[activeIndex]) {
+                hls.loadSource(links[activeIndex]);
+                vid.play();
+            }
+        }, 5000);
+    }
+}
     
     // ===== CHANNELS =====
     const channels = [
