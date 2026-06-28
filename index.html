@@ -9,130 +9,41 @@
     <link rel="icon" type="image/webp" href="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
     <style>
-        /* ===== RESET ===== */
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { background:#0b0c10; font-family:sans-serif; color:#fff; overflow-x:hidden; min-height:100vh; }
-        :root { --mint: #00ff66; --panel: #11141a; --red: #ff4757; }
+/* ===== RESET ===== */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0b0c10; font-family:sans-serif; color:#fff; overflow-x:hidden; min-height:100vh; }
+:root { --mint: #00ff66; --panel: #11141a; --red: #ff4757; }
 
-        /* ===== WELCOME SCREEN ===== */
-        #welcome-screen {
-            position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: url("https://i.ibb.co.com/vvCwyJG5/WC-1.png") center/cover no-repeat;
-            background-color: #0b0c10;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .welcome-box {
-            background: linear-gradient(135deg, #000, #00ff6611);
-            padding: 40px 30px;
-            border: 2px solid var(--mint);
-            border-radius: 20px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-        .logo-img {
-            width: 120px;
-            height: auto;
-            margin-bottom: 15px;
-            border-radius: 10px;
-        }
-        .welcome-box h1 {
-            color: var(--mint);
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-        }
-        .welcome-box p {
-            color: #889;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-        #passcode-input {
-            background: transparent;
-            border: 2px solid var(--mint);
-            color: var(--mint);
-            padding: 12px;
-            font-size: 1.5rem;
-            text-align: center;
-            width: 120px;
-            letter-spacing: 8px;
-            border-radius: 8px;
-            outline: none;
-        }
-        #passcode-input:focus { box-shadow: 0 0 15px rgba(0,255,102,0.3); }
-        #login-error {
-            color: var(--red);
-            margin-top: 12px;
-            font-weight: bold;
-            display: none;
-        }
-        .login-footer {
-            margin-top: 15px;
-            color: #556;
-            font-size: 0.75rem;
-        }
+/* ===== WELCOME SCREEN ===== */
+#welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: url("https://i.ibb.co.com/vvCwyJG5/WC-1.png") center/cover no-repeat; background-color: #0b0c10; z-index: 9999; display: flex; justify-content: center; align-items: center; }
+.welcome-box { background: linear-gradient(135deg, #000, #00ff6611); padding: 40px 30px; border: 2px solid var(--mint); border-radius: 20px; text-align: center; max-width: 400px; width: 90%; }
+.logo-img { width: 120px; height: auto; margin-bottom: 15px; border-radius: 10px; }
+.welcome-box h1 { color: var(--mint); font-size: 1.8rem; margin-bottom: 5px; }
 
 /* Main Container */
 #main-content { max-width: 1000px; margin: 0 auto; padding: 20px; display: none; }
 
-/* Video Player Header */
-#video-header { 
-    background: #000; 
-    border-radius: 12px; 
-    overflow: hidden; 
-    border: 1px solid #222; 
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-}
-
-.controls { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding: 15px; 
-    background: #0a0a0a; 
-    color: var(--mint); 
-}
-
-.controls i { cursor: pointer; font-size: 1.2rem; padding: 5px; transition: 0.2s; }
-.controls i:hover { color: #fff; transform: scale(1.1); }
-
-/* Channel Grid */
-.grid { 
-    display: grid; 
-    gap: 15px; 
-    padding-top: 20px; 
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
-}
-
-.card { 
-    background: var(--panel); 
-    padding: 20px; 
-    border-radius: 12px; 
-    border: 1px solid #222; 
-    cursor: pointer; 
-    transition: 0.3s; 
-    text-align: center;
-}
-
-.card:hover { border-color: var(--mint); background: #161b22; }
-.card.active { border-color: var(--mint); background: #00ff6615; }
-
 /* Top Bar */
-.top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; }
-.top-bar .logo { display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 1.5rem; color: var(--mint); }
-.top-bar .logo img { height: 40px; border-radius: 6px; }
+.top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); border-bottom: 2px solid var(--mint); }
+.top-bar .logo { display: flex; align-items: center; gap: 10px; }
+.top-bar .logo img { height: 40px; width: auto; border-radius: 6px; }
+.top-bar .logo span { color: var(--mint); font-weight: bold; font-size: 1.2rem; }
+
+/* Video Player Header */
+#video-header { background: #000; border-radius: 12px; overflow: hidden; border: 1px solid #222; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+.controls { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: rgba(0,0,0,0.8); color: var(--mint); }
+.controls i { cursor: pointer; font-size: 1.2rem; transition: 0.2s; padding: 5px; }
+.controls i:hover { color: #fff; }
+
+/* Grid */
+.grid { display: grid; gap: 10px; padding: 15px 0; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.card { background: var(--panel); padding: 15px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; text-align: center; transition: 0.2s; }
+.card:hover { border-color: var(--mint); background: #161b22; }
+.card.active { border-color: var(--mint); background: #1a2a3a; }
 
 /* Adjust Panel */
-#adjust-panel { 
-    background: #111; 
-    padding: 15px; 
-    border-radius: 8px; 
-    margin-top: 10px; 
-    border: 1px solid #333; 
-    display: none;
+#adjust-panel { position: relative; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; display: none; margin-top: 10px; }
+#adjust-panel input { width: 100%; margin-top: 5px; }
         
         /* ===== TOP BAR (LOGO + CLOCK + MENU) ===== */
         .top-bar {
