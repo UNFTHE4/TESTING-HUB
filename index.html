@@ -83,19 +83,69 @@
             padding: 0 10px 20px;
         }
 
-        /* ===== VIDEO HEADER ===== */
-        #video-header {
-            background: #000;
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-        #player {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: #000;
-        }
+/* ===== MODERN VIDEO PLAYER ===== */
+#video-header {
+    background: #000;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    color: #fff;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    transition: opacity 0.3s;
+}
+
+.controls i {
+    cursor: pointer;
+    font-size: 1.3rem;
+    transition: transform 0.2s, color 0.2s;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.controls i:hover {
+    color: var(--mint);
+    transform: scale(1.15);
+}
+
+#status-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--mint);
+}
+
+/* Glassmorphism Adjust Panel */
+#adjust-panel {
+    position: absolute;
+    bottom: 70px;
+    right: 20px;
+    background: rgba(17, 20, 26, 0.85);
+    backdrop-filter: blur(15px);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 200px;
+    display: none;
+    z-index: 1000;
+}
+
+#adjust-panel input {
+    accent-color: var(--mint);
+    cursor: pointer;
+}
 
         /* ===== TOP BAR (LOGO + CLOCK + MENU) ===== */
         .top-bar {
