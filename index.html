@@ -7,7 +7,13 @@
     <title>UNF STREAM HUB</title>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/webp" href="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
+    
+    <!-- ===== NEW VIDEO.JS PLAYER CSS ===== -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@videojs/html/cdn/video-minimal-ui.css" />
+    
+    <!-- ===== NEW VIDEO.JS PLAYER MODULE ===== -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/html/cdn/video-minimal-ui.js"></script>
+
     <style>
         /* ===== RESET ===== */
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -91,10 +97,23 @@
             overflow: hidden;
             margin-top: 10px;
         }
-        #player {
+
+        /* ===== NEW VIDEO.JS PLAYER STYLES (Overrides) ===== */
+        video-player {
+            display: block;
             width: 100%;
-            aspect-ratio: 16/9;
             background: #000;
+        }
+        media-container {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+        }
+        video-player video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         /* ===== TOP BAR (LOGO + CLOCK + MENU) ===== */
@@ -172,31 +191,6 @@
         #menu-dropdown div:last-child:hover {
             background: rgba(255, 71, 87, 0.1);
             color: var(--red);
-        }
-
-        /* ===== CONTROLS ===== */
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            background: rgba(0,0,0,0.8);
-            color: var(--mint);
-        }
-        .controls i {
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: 0.2s;
-        }
-        .controls i:hover { color: #fff; }
-        .controls .left, .controls .right {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        #status-text {
-            font-weight: bold;
-            font-size: 0.9rem;
         }
 
         /* ===== OVERLAYS ===== */
@@ -356,78 +350,6 @@
             margin-top: 10px;
             font-weight: bold;
         }
-
-        /* ===== CHAT OVERLAY ===== */
-        #chat-overlay {
-            display: none;
-            position: fixed;
-            bottom: 80px;
-            right: 15px;
-            width: 350px;
-            height: 450px;
-            background: rgba(17, 20, 26, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--mint);
-            border-radius: 16px;
-            padding: 10px;
-            z-index: 3000;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.9);
-            flex-direction: column;
-        }
-        #chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            color: var(--mint);
-            font-weight: bold;
-            padding: 0 5px;
-        }
-        #chat-header i { cursor: pointer; color: #888; }
-        #chat-iframe-container {
-            flex: 1;
-            width: 100%;
-            height: 100%;
-            border-radius: 10px;
-            overflow: hidden;
-            background: #000;
-        }
-        #chat-iframe-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* ===== YOUTUBE-STYLE MOBILE CHAT ===== */
-        @media (max-width: 600px) {
-            #chat-overlay {
-                top: auto;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                width: 100%;
-                height: 50vh; /* Covers exactly the bottom half */
-                border-radius: 16px 16px 0 0;
-                border: 2px solid var(--mint);
-                border-bottom: none;
-                padding: 0;
-                background: rgba(17, 20, 26, 0.98);
-                backdrop-filter: blur(20px);
-                z-index: 9999;
-                box-shadow: 0 -10px 30px rgba(0,0,0,0.9);
-            }
-            #chat-header {
-                padding: 12px 20px;
-                margin-bottom: 0;
-                background: #11141a;
-                border-bottom: 1px solid #333;
-                border-radius: 16px 16px 0 0;
-            }
-            #chat-iframe-container {
-                border-radius: 0;
-                height: calc(100% - 50px);
-            }
-        }
     </style>
 </head>
 <body>
@@ -472,28 +394,207 @@
             <img id="buffer-gif" src="https://media4.giphy.com/media/aBW9YyswmydvlKf7ZU/giphy.gif">
             <div id="error-msg">IF STREAM IS NOT WORKING PLEASE REPORT AND LET US KNOW</div>
         </div>
-        <video id="player" playsinline></video>
-        
-        <!-- ===== CONTROLS WITH CHAT BUTTON ===== -->
-        <div class="controls">
-            <div class="left">
-                <i class="fa-solid fa-play" onclick="vid.play()"></i>
-            </div>
-            
-            <!-- MIDDLE: Channel Name -->
-            <div style="display:flex; align-items:center; justify-content:center; flex:1;">
-                <span id="status-text">SELECT CHANNEL</span>
-            </div>
 
-            <!-- RIGHT: Chat + 3 Icons Grouped Together -->
-            <div class="right" style="display:flex; align-items:center; gap:15px;">
-                <i class="fa-solid fa-comment-dots" onclick="toggleChat()" style="cursor:pointer; font-size:1.2rem; color:var(--mint);"></i>
-                <i class="fa-solid fa-sliders" onclick="togglePanel()"></i>
-                <i class="fa-solid fa-volume-up" id="vol-icon" onclick="toggleMute()"></i>
-                <i class="fa-solid fa-expand" onclick="goFullscreen()"></i>
-            </div>
-        </div>
+        <!-- ===== NEW VIDEO.JS PLAYER ===== -->
+        <video-player>
+            <media-container class="media-minimal-skin media-minimal-skin--video">
+                <video id="player" playsinline></video>
 
+                <media-poster>
+                    <img src="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp" />
+                </media-poster>
+
+                <media-buffering-indicator class="media-buffering-indicator">
+                    <media-icon name="spinner" family="minimal" class="media-icon"></media-icon>
+                </media-buffering-indicator>
+
+                <media-error-dialog class="media-error">
+                    <div class="media-error__dialog">
+                        <div class="media-error__content">
+                            <media-alert-dialog-title class="media-error__title">Stream Error</media-alert-dialog-title>
+                            <media-alert-dialog-description class="media-error__description">Please try another channel or report the issue.</media-alert-dialog-description>
+                        </div>
+                        <div class="media-error__actions">
+                            <media-alert-dialog-close class="media-button media-button--primary">OK</media-alert-dialog-close>
+                        </div>
+                    </div>
+                </media-error-dialog>
+
+                <media-controls class="media-controls">
+                    <media-tooltip-group>
+                        <div class="media-button-group">
+                            <media-play-button commandfor="play-tooltip" class="media-button media-button--subtle media-button--icon media-button--play">
+                                <media-icon name="restart" family="minimal" class="media-icon media-icon--restart"></media-icon>
+                                <media-icon name="play" family="minimal" class="media-icon media-icon--play"></media-icon>
+                                <media-icon name="pause" family="minimal" class="media-icon media-icon--pause"></media-icon>
+                            </media-play-button>
+                            <media-tooltip id="play-tooltip" side="top" class="media-tooltip"></media-tooltip>
+
+                            <media-seek-button commandfor="seek-backward-tooltip" seconds="-10" class="media-button media-button--subtle media-button--icon media-button--seek">
+                                <span class="media-icon__container">
+                                    <media-icon name="seek" family="minimal" class="media-icon media-icon--flipped"></media-icon>
+                                    <span class="media-icon__label">10</span>
+                                </span>
+                            </media-seek-button>
+                            <media-tooltip id="seek-backward-tooltip" side="top" class="media-tooltip"></media-tooltip>
+
+                            <media-seek-button commandfor="seek-forward-tooltip" seconds="10" class="media-button media-button--subtle media-button--icon media-button--seek">
+                                <span class="media-icon__container">
+                                    <media-icon name="seek" family="minimal" class="media-icon"></media-icon>
+                                    <span class="media-icon__label">10</span>
+                                </span>
+                            </media-seek-button>
+                            <media-tooltip id="seek-forward-tooltip" side="top" class="media-tooltip"></media-tooltip>
+                        </div>
+
+                        <div class="media-time-controls">
+                            <media-time-group class="media-time-group">
+                                <media-time type="current" class="media-time media-time--current"></media-time>
+                                <media-time-separator class="media-time-separator"></media-time-separator>
+                                <media-time type="duration" class="media-time media-time--duration"></media-time>
+                            </media-time-group>
+
+                            <media-time-slider class="media-slider">
+                                <media-slider-track class="media-slider__track">
+                                    <media-slider-fill class="media-slider__fill"></media-slider-fill>
+                                    <media-slider-buffer class="media-slider__buffer"></media-slider-buffer>
+                                </media-slider-track>
+                                <media-slider-thumb class="media-slider__thumb"></media-slider-thumb>
+
+                                <div class="media-preview media-slider__preview">
+                                    <div class="media-preview__thumbnail-wrapper">
+                                        <media-slider-thumbnail class="media-preview__thumbnail"></media-slider-thumbnail>
+                                    </div>
+                                    <media-slider-value type="pointer" class="media-time media-preview__time"></media-slider-value>
+                                    <media-icon name="spinner" family="minimal" class="media-preview__spinner media-icon"></media-icon>
+                                </div>
+                            </media-time-slider>
+                        </div>
+
+                        <div class="media-button-group">
+                            <media-playback-rate-menu-trigger commandfor="playback-rate-menu" class="media-button media-button--subtle media-button--icon media-button--playback-rate"></media-playback-rate-menu-trigger>
+                            <media-playback-rate-menu id="playback-rate-menu" side="top" align="center" class="media-popover media-menu media-menu--playback-rate">
+                                <media-playback-rate-options class="media-menu__group">
+                                    <template>
+                                        <media-menu-radio-item class="media-menu__item">
+                                            <span data-part="label"></span>
+                                            <media-menu-item-indicator force-mount class="media-menu__indicator">
+                                                <media-icon name="check" family="minimal" class="media-icon"></media-icon>
+                                            </media-menu-item-indicator>
+                                        </media-menu-radio-item>
+                                    </template>
+                                </media-playback-rate-options>
+                            </media-playback-rate-menu>
+
+                            <media-mute-button commandfor="video-volume-popover" class="media-button media-button--subtle media-button--icon media-button--mute">
+                                <media-icon name="volume-off" family="minimal" class="media-icon media-icon--volume-off"></media-icon>
+                                <media-icon name="volume-low" family="minimal" class="media-icon media-icon--volume-low"></media-icon>
+                                <media-icon name="volume-high" family="minimal" class="media-icon media-icon--volume-high"></media-icon>
+                            </media-mute-button>
+
+                            <media-popover id="video-volume-popover" open-on-hover delay="200" close-delay="100" side="top" class="media-popover media-popover--volume">
+                                <media-volume-slider class="media-slider" orientation="vertical" thumb-alignment="edge">
+                                    <media-slider-track class="media-slider__track">
+                                        <media-slider-fill class="media-slider__fill"></media-slider-fill>
+                                    </media-slider-track>
+                                    <media-slider-thumb class="media-slider__thumb media-slider__thumb--persistent"></media-slider-thumb>
+                                </media-volume-slider>
+                            </media-popover>
+
+                            <media-captions-button commandfor="captions-tooltip" class="media-button media-button--subtle media-button--icon media-button--captions">
+                                <media-icon name="captions-off" family="minimal" class="media-icon media-icon--captions-off"></media-icon>
+                                <media-icon name="captions-on" family="minimal" class="media-icon media-icon--captions-on"></media-icon>
+                            </media-captions-button>
+                            <media-tooltip id="captions-tooltip" side="top" class="media-tooltip"></media-tooltip>
+
+                            <media-cast-button commandfor="cast-tooltip" class="media-button media-button--subtle media-button--icon media-button--cast">
+                                <media-icon name="cast-enter" family="minimal" class="media-icon media-icon--cast-enter"></media-icon>
+                                <media-icon name="cast-exit" family="minimal" class="media-icon media-icon--cast-exit"></media-icon>
+                            </media-cast-button>
+                            <media-tooltip id="cast-tooltip" side="top" class="media-tooltip"></media-tooltip>
+
+                            <media-pip-button commandfor="pip-tooltip" class="media-button media-button--subtle media-button--icon media-button--pip">
+                                <media-icon name="pip-enter" family="minimal" class="media-icon media-icon--pip-enter"></media-icon>
+                                <media-icon name="pip-exit" family="minimal" class="media-icon media-icon--pip-exit"></media-icon>
+                            </media-pip-button>
+                            <media-tooltip id="pip-tooltip" side="top" class="media-tooltip"></media-tooltip>
+
+                            <media-fullscreen-button commandfor="fullscreen-tooltip" class="media-button media-button--subtle media-button--icon media-button--fullscreen">
+                                <media-icon name="fullscreen-enter" family="minimal" class="media-icon media-icon--fullscreen-enter"></media-icon>
+                                <media-icon name="fullscreen-exit" family="minimal" class="media-icon media-icon--fullscreen-exit"></media-icon>
+                            </media-fullscreen-button>
+                            <media-tooltip id="fullscreen-tooltip" side="top" class="media-tooltip"></media-tooltip>
+                        </div>
+                    </media-tooltip-group>
+                </media-controls>
+
+                <div class="media-overlay"></div>
+
+                <!-- Hotkeys -->
+                <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
+                <media-hotkey keys="k" action="togglePaused"></media-hotkey>
+                <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
+                <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
+                <media-hotkey keys="c" action="toggleSubtitles"></media-hotkey>
+                <media-hotkey keys="i" action="togglePictureInPicture"></media-hotkey>
+                <media-hotkey keys="ArrowRight" action="seekStep" value="5"></media-hotkey>
+                <media-hotkey keys="ArrowLeft" action="seekStep" value="-5"></media-hotkey>
+                <media-hotkey keys="l" action="seekStep" value="10"></media-hotkey>
+                <media-hotkey keys="j" action="seekStep" value="-10"></media-hotkey>
+                <media-hotkey keys="ArrowUp" action="volumeStep" value="0.05"></media-hotkey>
+                <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.05"></media-hotkey>
+                <media-hotkey keys="0-9" action="seekToPercent"></media-hotkey>
+                <media-hotkey keys="Home" action="seekToPercent" value="0"></media-hotkey>
+                <media-hotkey keys="End" action="seekToPercent" value="100"></media-hotkey>
+                <media-hotkey keys=">" action="speedUp"></media-hotkey>
+                <media-hotkey keys="<" action="speedDown"></media-hotkey>
+
+                <!-- Gestures -->
+                <media-gesture type="tap" action="togglePaused" pointer="mouse" region="center"></media-gesture>
+                <media-gesture type="tap" action="toggleControls" pointer="touch"></media-gesture>
+                <media-gesture type="doubletap" action="seekStep" value="-10" region="left"></media-gesture>
+                <media-gesture type="doubletap" action="toggleFullscreen" region="center"></media-gesture>
+                <media-gesture type="doubletap" action="seekStep" value="10" region="right"></media-gesture>
+
+                <!-- Input Feedback -->
+                <media-status-announcer></media-status-announcer>
+                <div class="media-input-feedback">
+                    <media-volume-indicator hidden class="media-input-feedback-island media-input-feedback-island--volume">
+                        <media-volume-indicator-fill class="media-input-feedback-island__content">
+                            <media-icon name="volume-high" family="minimal" class="media-icon media-icon--volume-high"></media-icon>
+                            <media-icon name="volume-low" family="minimal" class="media-icon media-icon--volume-low"></media-icon>
+                            <media-icon name="volume-off" family="minimal" class="media-icon media-icon--volume-off"></media-icon>
+                            <div class="media-input-feedback-island__progress" aria-hidden="true"></div>
+                            <media-volume-indicator-value class="media-input-feedback-island__value"></media-volume-indicator-value>
+                        </media-volume-indicator-fill>
+                    </media-volume-indicator>
+
+                    <media-status-indicator hidden actions="toggleSubtitles toggleFullscreen togglePictureInPicture" class="media-input-feedback-island media-input-feedback-island--status">
+                        <div class="media-input-feedback-island__content">
+                            <media-icon name="captions-on" family="minimal" class="media-icon media-icon--captions-on"></media-icon>
+                            <media-icon name="captions-off" family="minimal" class="media-icon media-icon--captions-off"></media-icon>
+                            <media-icon name="fullscreen-enter" family="minimal" class="media-icon media-icon--fullscreen-enter"></media-icon>
+                            <media-icon name="fullscreen-exit" family="minimal" class="media-icon media-icon--fullscreen-exit"></media-icon>
+                            <media-icon name="pip-enter" family="minimal" class="media-icon media-icon--pip-enter"></media-icon>
+                            <media-icon name="pip-exit" family="minimal" class="media-icon media-icon--pip-exit"></media-icon>
+                            <media-status-indicator-value class="media-input-feedback-island__value"></media-status-indicator-value>
+                        </div>
+                    </media-status-indicator>
+
+                    <media-seek-indicator hidden class="media-input-feedback-bubble">
+                        <media-icon name="chevron" family="minimal" class="media-icon media-icon--seek"></media-icon>
+                        <media-seek-indicator-value class="media-time"></media-seek-indicator-value>
+                    </media-seek-indicator>
+
+                    <media-status-indicator hidden actions="togglePaused" class="media-input-feedback-bubble">
+                        <media-icon name="play" family="minimal" class="media-icon media-icon--play"></media-icon>
+                        <media-icon name="pause" family="minimal" class="media-icon media-icon--pause"></media-icon>
+                    </media-status-indicator>
+                </div>
+            </media-container>
+        </video-player>
+
+        <!-- Adjust Panel (unchanged) -->
         <div id="adjust-panel">
             <div>Saturation: <input max="200" min="0" oninput="applyFilter()" type="range" value="100"></div>
             <div>Contrast: <input max="150" min="50" oninput="applyFilter()" type="range" value="100"></div>
@@ -517,18 +618,6 @@
         <button onclick="saveMovieRequest()">✅ Request Movie</button>
         <button class="cancel-btn" onclick="document.getElementById('request-overlay').style.display='none'">Cancel</button>
         <div id="request-status"></div>
-    </div>
-</div>
-
-<!-- ===== CHAT OVERLAY ===== -->
-<div id="chat-overlay">
-    <div id="chat-header">
-        <span>💬 UNF Live Chat</span>
-        <i class="fa-solid fa-times" onclick="toggleChat()"></i>
-    </div>
-    <div id="chat-iframe-container">
-        <!-- YOUR CBOX IFRAME -->
-        <iframe src="https://deadsimplechat.com/_x5KSSXCX" allowtransparency="yes" allow="autoplay" frameborder="0" marginheight="0" marginwidth="0" scrolling="auto"></iframe>
     </div>
 </div>
 
@@ -556,7 +645,14 @@
     let tsnTimer = null;
 
     function goFullscreen() {
-        if (vid.requestFullscreen) vid.requestFullscreen();
+        const player = document.querySelector('video-player');
+        if (player.requestFullscreen) {
+            player.requestFullscreen();
+        } else if (player.webkitRequestFullscreen) {
+            player.webkitRequestFullscreen();
+        } else if (player.msRequestFullscreen) {
+            player.msRequestFullscreen();
+        }
     }
 
     function applyFilter() {
@@ -570,7 +666,6 @@
 
     function toggleMute() {
         vid.muted = !vid.muted;
-        document.getElementById('vol-icon').className = vid.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-up';
     }
 
     function playHls(url, name) {
@@ -591,6 +686,30 @@
             });
             hls.loadSource(url);
             hls.attachMedia(vid);
+
+            // ===== FORCE PLAY =====
+            vid.muted = true;
+            const playPromise = vid.play();
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        setTimeout(() => {
+                            vid.muted = false;
+                        }, 300);
+                    })
+                    .catch(() => {
+                        const fakeClick = new Event('click');
+                        vid.dispatchEvent(fakeClick);
+                        setTimeout(() => {
+                            vid.play().then(() => {
+                                setTimeout(() => {
+                                    vid.muted = false;
+                                }, 300);
+                            });
+                        }, 100);
+                    });
+            }
+
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
                 vid.play();
             });
@@ -659,7 +778,7 @@
             if (c.status === "online" && c.url) {
                 document.querySelectorAll('.card').forEach(el => el.classList.remove('active'));
                 card.classList.add('active');
-                document.getElementById('status-text').innerText = c.name;
+                // Note: The player handles its own status text now.
                 playHls(c.url, c.name);
             }
         };
@@ -695,7 +814,7 @@
 
     // ===== MOVIE SYSTEM =====
     const movieList = [
-        { name: "THE MOVIE", url: "http://cinehub24.com/ftp/Movies/hindidub/Rush%20Hour%20%281998%29/Rush%20Hour.mp4" }
+        { name: "THE MOVIE", url: "https://www.ftpbd.net/wp-content/hls-file/Spider-Man-2002-1080p-Hindi-Dubbed-BluRay_reencoded/index.m3u8" }
     ];
 
     function playMovie() {
@@ -705,7 +824,6 @@
             return;
         }
         const movie = movieList[0];
-        document.getElementById('status-text').innerText = `🎬 ${movie.name}`;
         playHls(movie.url, movie.name);
     }
 
@@ -717,13 +835,10 @@
     function saveMovieRequest() {
         const title = document.getElementById('movie-title').value.trim();
         if (!title) return;
-
         const email = "UNF.INT@proton.me";
         const subject = encodeURIComponent("New Movie Request");
         const body = encodeURIComponent("I would like to request the movie: " + title);
-        
         window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-        
         document.getElementById('request-overlay').style.display = 'none';
     }
     
@@ -733,16 +848,6 @@
         const subject = encodeURIComponent('UNF Hub - Error Report');
         const body = encodeURIComponent('Please describe the error you encountered:\n\n');
         window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
-    }
-
-    // ===== CHAT SYSTEM (Cbox toggle) =====
-    function toggleChat() {
-        const overlay = document.getElementById('chat-overlay');
-        if (overlay.style.display === 'flex') {
-            overlay.style.display = 'none';
-        } else {
-            overlay.style.display = 'flex';
-        }
     }
 
     // Close menu when clicking outside
