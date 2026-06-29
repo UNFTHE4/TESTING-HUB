@@ -14,14 +14,19 @@
         
         /* --- YOUTUBE SKIN OVERRIDES --- */
         .video-js { width: 100% !important; height: auto !important; aspect-ratio: 16/9; }
-/* KILL THE BLACK BAR */
+/* Make the bar visible but transparent */
 .video-js .vjs-control-bar {
     background: transparent !important;
-    background-color: transparent !important;
+    background-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent) !important;
     border: none !important;
-    background-image: linear-gradient(to top, rgba(0,0,0,0.7), transparent) !important;
+    opacity: 1 !important; /* This makes the buttons visible again */
+    display: flex !important; /* Ensures buttons are laid out correctly */
+}
+
+/* Optional: Make it fade only when the mouse is NOT over the player */
+.video-js.vjs-user-inactive .vjs-control-bar {
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 1.0s;
 }
 
 /* Ensure the player container itself doesn't have a background */
