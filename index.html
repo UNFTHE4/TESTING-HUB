@@ -12,29 +12,33 @@
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:#0b0c10; font-family:sans-serif; color:#fff; }
         
-        /* --- YOUTUBE SKIN OVERRIDES --- */
-        .video-js { width: 100% !important; height: auto !important; aspect-ratio: 16/9; }
-/* Make the bar visible but transparent */
+/* --- YOUTUBE CLEAN SKIN --- */
+        .video-js { width: 100% !important; height: auto !important; aspect-ratio: 16/9; background-color: transparent !important; }
+
+        /* The Control Bar: Floating, Translucent, and Visible */
+/* FORCE the control bar to be transparent and remove any default styling */
 .video-js .vjs-control-bar {
     background: transparent !important;
-    background-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent) !important;
+    background-image: linear-gradient(to top, rgba(0,0,0,0.7), transparent) !important;
     border: none !important;
-    opacity: 1 !important; /* This makes the buttons visible again */
-    display: flex !important; /* Ensures buttons are laid out correctly */
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    /* This ensures it stays at the bottom */
+    bottom: 0 !important;
+    position: absolute !important;
 }
 
-/* Optional: Make it fade only when the mouse is NOT over the player */
-.video-js.vjs-user-inactive .vjs-control-bar {
-    opacity: 0;
-    transition: opacity 1.0s;
-}
+        /* Ensure buttons are white and always visible */
+        .video-js .vjs-control {
+            color: #ffffff !important;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
 
-/* Ensure the player container itself doesn't have a background */
-.video-js {
-    background-color: transparent !important;
-}
-        .video-js .vjs-play-progress { background: #ff0000 !important; }
-        .video-js .vjs-slider-bar { background: #ff0000 !important; }
+        /* Red Progress Bar */
+        .video-js .vjs-play-progress, .video-js .vjs-slider-bar { background: #ff0000 !important; }
+
+        /* Big Play Button */
         .video-js .vjs-big-play-button {
             background: rgba(0,0,0,0.4) !important;
             border: 2px solid white !important;
@@ -43,16 +47,8 @@
             line-height: 60px !important;
             left: 50% !important; top: 50% !important;
             margin-left: -30px !important; margin-top: -30px !important;
-            transition: all 0.2s;
         }
         .video-js .vjs-big-play-button:hover { background: #ff0000 !important; border-color: #ff0000 !important; }
-
-        /* Your existing theme styles */
-        #main-content { max-width: 1000px; margin: 0 auto; padding: 20px; }
-        .top-bar { display: flex; justify-content: space-between; padding: 10px; background: #000; border-bottom: 2px solid #00ff66; }
-        .grid { display: grid; gap: 10px; padding: 20px 0; grid-template-columns: repeat(4, 1fr); }
-        .card { background: #11141a; padding: 15px; border-radius: 8px; cursor: pointer; border: 1px solid #333; }
-        .card:hover { border-color: #00ff66; }
     </style>
 </head>
 <body>
