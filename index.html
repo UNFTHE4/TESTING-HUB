@@ -14,7 +14,24 @@
         
         /* --- YOUTUBE SKIN OVERRIDES --- */
         .video-js { width: 100% !important; height: auto !important; aspect-ratio: 16/9; }
-        .video-js .vjs-control-bar { background: rgba(0,0,0,0.85) !important; }
+        /* Remove the solid black background */
+.video-js .vjs-control-bar {
+    background: transparent !important;
+    background-image: linear-gradient(to top, rgba(0,0,0,0.7), transparent) !important;
+    /* Optional: Hide it until the user moves their mouse */
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Show the controls when the user hovers over the player */
+.video-js:hover .vjs-control-bar {
+    opacity: 1;
+}
+
+/* Ensure buttons have no background */
+.video-js .vjs-control {
+    background: none !important;
+}
         .video-js .vjs-play-progress { background: #ff0000 !important; }
         .video-js .vjs-slider-bar { background: #ff0000 !important; }
         .video-js .vjs-big-play-button {
