@@ -1,535 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
     <title>UNF STREAM HUB</title>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/webp" href="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp">
-
-    <!-- ✅ Video.JS Core CSS -->
+    
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
-
-    <!-- ✅ Video.JS Core JS -->
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
-
-    <!-- ✅ Video.JS HLS Plugin (Required for .m3u8 streams) -->
     <script src="https://cdn.jsdelivr.net/npm/@videojs/http-streaming@3.0.0/dist/videojs-http-streaming.min.js"></script>
 
-    <!-- Your existing styles below... -->
     <style>
-        /* --- YouTube-like Player Styling --- */
-.video-js .vjs-control-bar {
-    background: rgba(0, 0, 0, 0.7) !important;
-}
-
-.video-js .vjs-play-progress {
-    background-color: #ff0000 !important;
-}
-
-.video-js .vjs-big-play-button {
-    background-color: rgba(0, 0, 0, 0.5) !important;
-    border-radius: 50% !important;
-    border: 2px solid #fff !important;
-    width: 2.5em !important;
-    height: 2.5em !important;
-    line-height: 2.5em !important;
-    left: 50% !important;
-    top: 50% !important;
-    margin-left: -1.25em !important;
-    margin-top: -1.25em !important;
-}
-        /* ===== RESET ===== */
+        /* --- KEEPING YOUR THEME --- */
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:#0b0c10; font-family:sans-serif; color:#fff; overflow-x:hidden; min-height:100vh; }
         :root { --mint: #00ff66; --panel: #11141a; --red: #ff4757; }
-
-        /* ===== WELCOME SCREEN ===== */
-        #welcome-screen {
-            position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: url("https://i.ibb.co.com/vvCwyJG5/WC-1.png") center/cover no-repeat;
-            background-color: #0b0c10;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .welcome-box {
-            background: linear-gradient(135deg, #000, #00ff6611);
-            padding: 40px 30px;
-            border: 2px solid var(--mint);
-            border-radius: 20px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-        }
-        .logo-img {
-            width: 120px;
-            height: auto;
-            margin-bottom: 15px;
-            border-radius: 10px;
-        }
-        .welcome-box h1 {
-            color: var(--mint);
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-        }
-        .welcome-box p {
-            color: #889;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
-        #passcode-input {
-            background: transparent;
-            border: 2px solid var(--mint);
-            color: var(--mint);
-            padding: 12px;
-            font-size: 1.5rem;
-            text-align: center;
-            width: 120px;
-            letter-spacing: 8px;
-            border-radius: 8px;
-            outline: none;
-        }
-        #passcode-input:focus { box-shadow: 0 0 15px rgba(0,255,102,0.3); }
-        #login-error {
-            color: var(--red);
-            margin-top: 12px;
-            font-weight: bold;
-            display: none;
-        }
-        .login-footer {
-            margin-top: 15px;
-            color: #556;
-            font-size: 0.75rem;
+        
+        /* --- YOUTUBE-STYLE PLAYER OVERRIDES --- */
+        .video-js .vjs-control-bar { background: rgba(0, 0, 0, 0.7) !important; }
+        .video-js .vjs-play-progress { background-color: #ff0000 !important; }
+        .video-js .vjs-big-play-button {
+            background-color: rgba(0, 0, 0, 0.5) !important;
+            border-radius: 50% !important;
+            border: 2px solid #fff !important;
+            width: 2.5em !important; height: 2.5em !important;
+            line-height: 2.5em !important;
+            left: 50% !important; top: 50% !important;
+            margin-left: -1.25em !important; margin-top: -1.25em !important;
         }
 
-        /* ===== MAIN CONTENT ===== */
-        #main-content {
-            display: none;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 10px 20px;
-        }
-
-        /* ===== VIDEO HEADER ===== */
-        #video-header {
-            background: #000;
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        /* ===== NEW VIDEO.JS PLAYER STYLES (Overrides) ===== */
-        video-player {
-            display: block;
-            width: 100%;
-            background: #000;
-        }
-        media-container {
-            display: block;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000;
-        }
-        video-player video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        /* ===== TOP BAR (LOGO + CLOCK + MENU) ===== */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px);
-            border-bottom: 2px solid var(--mint);
-        }
-        .top-bar .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .top-bar .logo img {
-            height: 40px;
-            width: auto;
-            border-radius: 6px;
-        }
-        .top-bar .logo span {
-            color: var(--mint);
-            font-weight: bold;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-        }
-        .top-bar .right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        #digital-clock {
-            color: var(--mint);
-            font-family: monospace;
-            font-size: 1rem;
-            background: rgba(0,0,0,0.5);
-            padding: 4px 14px;
-            border-radius: 20px;
-            border: 1px solid var(--mint);
-        }
-        @media (max-width: 899px) {
-            #digital-clock { display: none; }
-        }
-
-        /* ===== MENU DROPDOWN ===== */
-        #menu-dropdown {
-            display: none;
-            position: absolute;
-            top: 70px;
-            right: 15px;
-            background: #11141a;
-            border: 1px solid var(--mint);
-            border-radius: 12px;
-            padding: 10px 0;
-            width: 180px;
-            z-index: 2000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-        }
-        #menu-dropdown div {
-            padding: 12px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid #222;
-            color: #fff;
-            transition: 0.2s;
-        }
-        #menu-dropdown div:hover {
-            background: rgba(0, 255, 102, 0.1);
-            color: var(--mint);
-        }
-        #menu-dropdown div:last-child {
-            border-bottom: none;
-        }
-        #menu-dropdown div:last-child:hover {
-            background: rgba(255, 71, 87, 0.1);
-            color: var(--red);
-        }
-
-        /* ===== OVERLAYS ===== */
-        #status-overlay {
-            position: absolute;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 99;
-            pointer-events: none;
-            text-align: center;
-        }
-        #buffer-gif {
-            display: none;
-            width: 60px;
-        }
-        #error-msg {
-            display: none;
-            color: white;
-            background: rgba(0,0,0,0.8);
-            padding: 10px 20px;
-            border-radius: 8px;
-        }
-
-        /* ===== GRID ===== */
-        .grid {
-            display: grid;
-            gap: 10px;
-            padding: 15px 0;
-        }
-        .card {
-            background: var(--panel);
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            color: #fff;
-            transition: all 0.2s ease;
-        }
-        .card.active {
-            border-color: var(--mint);
-            background: #1a2a3a;
-            box-shadow: 0 0 15px rgba(0,255,102,0.3);
-            transform: scale(1.02);
-        }
-        .card.offline {
-            opacity: 0.5;
-            filter: grayscale(1);
-        }
-        .card.starting-soon {
-            opacity: 0.7;
-            border-color: #ffaa00;
-        }
-        .online-text { color: var(--mint); font-weight: bold; }
-        .offline-text { color: var(--red); font-weight: bold; }
-        .starting-soon-text { color: #ffaa00; font-weight: bold; }
-
-        @media (max-width: 899px) {
-            .grid { grid-template-columns: 1fr 1fr; }
-        }
-        @media (min-width: 900px) {
-            .grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        /* ===== ADJUST PANEL ===== */
-        #adjust-panel {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            right: 10px;
-            max-width: 500px;
-            margin: 0 auto;
-            background: #111;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--mint);
-            display: none;
-            z-index: 1000;
-        }
-        #adjust-panel div {
-            margin-bottom: 10px;
-        }
-        #adjust-panel input {
-            width: 100%;
-        }
-
-        /* ===== FOOTER ===== */
-        .footer {
-            text-align: center;
-            font-size: 11px;
-            color: #666;
-            padding: 30px 10px;
-            margin-top: 20px;
-            border-top: 1px solid #222;
-        }
-
-        /* ===== REQUEST MOVIE OVERLAY ===== */
-        #request-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 9998;
-            justify-content: center;
-            align-items: center;
-        }
-        .request-box {
-            background: #11141a;
-            padding: 30px;
-            border-radius: 20px;
-            border: 2px solid var(--mint);
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-        .request-box h2 {
-            color: var(--mint);
-            margin-bottom: 10px;
-        }
-        .request-box p {
-            color: #889;
-            margin-bottom: 15px;
-        }
-        .request-box input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background: #0b0c10;
-<video id="player" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" width="100%" height="100%" style="width: 100%; height: auto; aspect-ratio: 16/9;" playsinline data-setup='{}'></video>
-        }
-        .request-box button {
-            width: 100%;
-            padding: 12px;
-            background: var(--mint);
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .request-box button:hover {
-            background: #00dd55;
-        }
-        .request-box .cancel-btn {
-            margin-top: 10px;
-            background: transparent;
-            border: 1px solid #555;
-            color: #889;
-        }
-        .request-box .cancel-btn:hover {
-            background: #222;
-        }
-        #request-status {
-            margin-top: 10px;
-            font-weight: bold;
-        }
+        /* --- YOUR EXISTING STYLES --- */
+        #welcome-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: url("https://i.ibb.co.com/vvCwyJG5/WC-1.png") center/cover no-repeat; background-color: #0b0c10; z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .welcome-box { background: linear-gradient(135deg, #000, #00ff6611); padding: 40px 30px; border: 2px solid var(--mint); border-radius: 20px; text-align: center; max-width: 400px; width: 90%; }
+        .logo-img { width: 120px; height: auto; margin-bottom: 15px; border-radius: 10px; }
+        .welcome-box h1 { color: var(--mint); font-size: 1.8rem; margin-bottom: 5px; }
+        .welcome-box p { color: #889; font-size: 0.9rem; margin-bottom: 20px; }
+        #passcode-input { background: transparent; border: 2px solid var(--mint); color: var(--mint); padding: 12px; font-size: 1.5rem; text-align: center; width: 120px; letter-spacing: 8px; border-radius: 8px; outline: none; }
+        #main-content { display: none; max-width: 1000px; margin: 0 auto; padding: 0 10px 20px; }
+        #video-header { background: #000; position: relative; border-radius: 12px; overflow: hidden; margin-top: 10px; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); border-bottom: 2px solid var(--mint); }
+        .top-bar .logo span { color: var(--mint); font-weight: bold; font-size: 1.2rem; }
+        #digital-clock { color: var(--mint); font-family: monospace; font-size: 1rem; background: rgba(0,0,0,0.5); padding: 4px 14px; border-radius: 20px; border: 1px solid var(--mint); }
+        .grid { display: grid; gap: 10px; padding: 15px 0; grid-template-columns: repeat(3, 1fr); }
+        .card { background: var(--panel); padding: 15px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; color: #fff; }
+        .card.active { border-color: var(--mint); background: #1a2a3a; }
+        .footer { text-align: center; font-size: 11px; color: #666; padding: 30px 10px; }
     </style>
 </head>
 <body>
 
-<!-- ===== WELCOME SCREEN ===== -->
-<div id="welcome-screen">
-    <div class="welcome-box">
-        <img class="logo-img" src="https://i.ibb.co.com/Df6zYZTZ/Adobe-Express-file.png" alt="UNF Logo">
-        <h1>UNF STREAM HUB</h1>
-        <p>United NTLA of Flario<br><span style="color:#667;font-size:0.75rem;">Enter 4-digit passcode</span></p>
-        <input id="passcode-input" type="password" maxlength="4" placeholder="****" inputmode="numeric" autofocus>
-        <div id="login-error">❌ Incorrect passcode!</div>
-        <div class="login-footer">For citizens of Flario only</div>
-    </div>
-</div>
-
-<!-- ===== MAIN CONTENT ===== -->
-<div id="main-content">
-
-    <!-- TOP BAR -->
-    <div class="top-bar">
-        <div class="logo">
-            <img src="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp" alt="UNF Logo">
-            <span>UNF</span>
+    <div id="welcome-screen">
+        <div class="welcome-box">
+            <img class="logo-img" src="https://i.ibb.co.com/Df6zYZTZ/Adobe-Express-file.png" alt="UNF Logo">
+            <h1>UNF STREAM HUB</h1>
+            <input id="passcode-input" type="password" maxlength="4" placeholder="****" inputmode="numeric">
         </div>
-        <div class="right">
-            <i class="fa-solid fa-bars" onclick="toggleMenu()" style="cursor:pointer; font-size:1.4rem; color:var(--mint);"></i>
+    </div>
+
+    <div id="main-content">
+        <div class="top-bar">
+            <div class="logo"><span>UNF</span></div>
             <div id="digital-clock">00:00 AM</div>
         </div>
+
+        <div id="video-header">
+            <video id="player" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" width="100%" height="auto" style="aspect-ratio: 16/9;" playsinline></video>
+            <div class="grid" id="channel-grid"></div>
+        </div>
+        <div class="footer">All RIGHTS OWNED BY UNF STREAM HUB SERVICE © 2026</div>
     </div>
 
-    <!-- MENU DROPDOWN -->
-    <div id="menu-dropdown">
-        <div onclick="playMovie()">🎬 Movie Player</div>
-        <div onclick="openRequestMovie()">🎞️ Request Movie</div>
-        <div onclick="reportError()">🚨 Report Error</div>
-    </div>
+    <script>
+        // Init Player
+        const player = videojs('player');
 
-<!-- ===== VIDEO HEADER ===== -->
-<div id="video-header">
-    <div id="status-overlay">
-        <img id="buffer-gif" src="https://media4.giphy.com/media/aBW9YyswmydvlKf7ZU/giphy.gif">
-        <div id="error-msg">IF STREAM IS NOT WORKING PLEASE REPORT AND LET US KNOW</div>
-    </div>
+        // Passcode
+        document.getElementById('passcode-input').addEventListener('input', function() {
+            if (this.value === "6767") {
+                document.getElementById('welcome-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            }
+        });
 
-    <!-- ✅ NEW Video.JS Player -->
-    <video
-        id="player"
-        class="video-js vjs-default-skin vjs-big-play-centered"
-        controls
-        preload="auto"
-        width="100%"
-        height="100%"
-        style="width: 100%; height: auto; aspect-ratio: 16/9;"
-        playsinline
-    ></video>
-
-    <!-- ✅ Adjust Panel (unchanged) -->
-    <div id="adjust-panel">
-        <div>Saturation: <input max="200" min="0" oninput="applyFilter()" type="range" value="100"></div>
-        <div>Contrast: <input max="150" min="50" oninput="applyFilter()" type="range" value="100"></div>
-        <div>Sharpness: <input max="100" min="0" oninput="applyFilter()" type="range" value="0"></div>
-    </div>
-    <div class="grid" id="channel-grid"></div>
-</div>
-
-    <!-- FOOTER -->
-    <div class="footer">
-        All RIGHTS OF THIS SITE OWN BY UNF STREAM HUB SERVICE. ITS USE TO BROADCAST ALL PUBLICALLY AVAILABLE STREAM WE FOUND ONLINE ©
-    </div>
-</div>
-
-<!-- ===== REQUEST MOVIE OVERLAY ===== -->
-<div id="request-overlay">
-    <div class="request-box">
-        <h2>🎞️ Request a Movie</h2>
-        <p>Enter the name of the movie you want to watch</p>
-        <input id="movie-title" type="text" placeholder="Movie Title">
-        <button onclick="saveMovieRequest()">✅ Request Movie</button>
-        <button class="cancel-btn" onclick="document.getElementById('request-overlay').style.display='none'">Cancel</button>
-        <div id="request-status"></div>
-    </div>
-</div>
-
-<script>
-    // ===== PASSCODE =====
-    function checkCode(val) {
-        if (val === "6767") {
-            document.getElementById('welcome-screen').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-            document.getElementById('login-error').style.display = 'none';
-        } else if (val.length === 4) {
-            document.getElementById('login-error').style.display = 'block';
-            document.getElementById('passcode-input').value = '';
-        }
-    }
-
-    document.getElementById('passcode-input').addEventListener('input', function() {
-        checkCode(this.value);
-    });
-
-// ===== VIDEO PLAYER ===== 
-const vid = document.getElementById('player');
-const s = document.querySelectorAll('#adjust-panel input');
-let tsnTimer = null; 
-
-function goFullscreen() {
-    const player = videojs('player');
-    if (player.requestFullscreen) {
-        player.requestFullscreen();
-    }
-}
-
-function applyFilter() {
-    vid.style.filter = `saturate(${s[0].value}%) contrast(${s[1].value}%) blur(${s[2].value / 50}px)`;
-}
-
-function togglePanel() {
-    const p = document.getElementById('adjust-panel');
-    p.style.display = (p.style.display === 'block') ? 'none' : 'block';
-}
-
-function toggleMute() {
-    // This will now interact with the Video.js instance
-    const player = videojs('player');
-    player.muted(!player.muted());
-}
-
-// THIS IS THE CLEANED UP VERSION
-function playHls(url, name) {
-    var player = videojs('player');
-    player.src({
-        src: url,
-        type: 'application/x-mpegURL'
-    });
-    player.play();
-}
-
-// Updated "D SPORTS" rotation
-if (name === "D SPORTS") {
-    const links = ["https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", "https://fl1004.bozztv.com/ushba-mafia/tracks-v1a1/mono.m3u8"];
-    const interval = 180000;
-    const player = videojs('player');
-    
-    tsnTimer = setInterval(() => {
-        const activeIndex = Math.floor(Date.now() / interval) % links.length;
-        if (player.src() !== links[activeIndex]) {
-            player.src({ src: links[activeIndex], type: 'application/x-mpegURL' });
+        // HLS Player Function
+        function playHls(url) {
+            player.src({ src: url, type: 'application/x-mpegURL' });
             player.play();
         }
-    }, 5000); // Check every 5 seconds
-}
 
-    // ===== CHANNELS =====
+        // Channels
  const channels = [
     {name: "T SPORTS", url: "https://tv.emnetbd.com/flussonic/Tsports1/tracks-v1a1/mono.m3u8", lang: "BAN/ENG", status: "online"},
     {name: "SKY SPORTS F1", url: "https://xstm.250909.cc/live/SPORTSFLUX-POOL-20acb0a9c8/5ffe6c552a88/1037.m3u8", lang: "ENG", status: "online"},
@@ -546,101 +107,22 @@ if (name === "D SPORTS") {
     {name: "WIN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", lang: "UNK", status: "online"}
 ];
 
-    const grid = document.getElementById('channel-grid');
-    channels.forEach(c => {
-        let card = document.createElement('div');
-        card.className = `card ${c.status}`;
-        card.innerHTML = `
-            <div style="font-weight:bold;">${c.name}</div>
-            <div style="font-size:0.7rem; color:#ccc;">${c.lang}</div>
-            <div class="${c.status}-text">${c.status.toUpperCase()}</div>
-        `;
-        card.onclick = () => {
-            if (c.status === "online" && c.url) {
-                document.querySelectorAll('.card').forEach(el => el.classList.remove('active'));
-                card.classList.add('active');
-                // Note: The player handles its own status text now.
-                playHls(c.url, c.name);
-            }
-        };
-        grid.appendChild(card);
-    });
 
-    // ===== VIDEO EVENTS =====
-    const gif = document.getElementById('buffer-gif');
-    const err = document.getElementById('error-msg');
-
-    vid.addEventListener('waiting', () => { gif.style.display = 'block'; });
-    vid.addEventListener('playing', () => { gif.style.display = 'none'; err.style.display = 'none'; });
-    vid.addEventListener('error', () => { gif.style.display = 'none'; err.style.display = 'block'; });
-
-    // ===== DIGITAL CLOCK =====
-    function updateClock() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
+        const grid = document.getElementById('channel-grid');
+        channels.forEach(c => {
+            let card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `<b>${c.name}</b>`;
+            card.onclick = () => playHls(c.url);
+            grid.appendChild(card);
         });
-        document.getElementById('digital-clock').innerText = timeString;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
 
-    // ===== MENU FUNCTIONS =====
-    function toggleMenu() {
-        const menu = document.getElementById('menu-dropdown');
-        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-    }
-
- // Change this at line 496
-const player = videojs('player');
-    const movieList = [
-        { name: "THE MOVIE", url: "https://www.ftpbd.net/wp-content/hls-file/Spider-Man-2002-1080p-Hindi-Dubbed-BluRay_reencoded/index.m3u8" }
-    ];
-
-    function playMovie() {
-        document.getElementById('menu-dropdown').style.display = 'none';
-        if (movieList.length === 0) {
-            alert("🎬 No movie has been added by the admin yet. Check back later!");
-            return;
+        // Clock
+        function updateClock() {
+            document.getElementById('digital-clock').innerText = new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
         }
-        const movie = movieList[0];
-        playHls(movie.url, movie.name);
-    }
-
-    function openRequestMovie() {
-        document.getElementById('menu-dropdown').style.display = 'none';
-        document.getElementById('request-overlay').style.display = 'flex';
-    }
-
-    function saveMovieRequest() {
-        const title = document.getElementById('movie-title').value.trim();
-        if (!title) return;
-        const email = "UNF.INT@proton.me";
-        const subject = encodeURIComponent("New Movie Request");
-        const body = encodeURIComponent("I would like to request the movie: " + title);
-        window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-        document.getElementById('request-overlay').style.display = 'none';
-    }
-    
-    function reportError() {
-        document.getElementById('menu-dropdown').style.display = 'none';
-        const email = 'UNF.INT@proton.me';
-        const subject = encodeURIComponent('UNF Hub - Error Report');
-        const body = encodeURIComponent('Please describe the error you encountered:\n\n');
-        window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
-    }
-
-    // Close menu when clicking outside
-    document.addEventListener('click', function(e) {
-        const menu = document.getElementById('menu-dropdown');
-        const icon = document.querySelector('.fa-bars');
-        if (menu.style.display === 'block' && !menu.contains(e.target) && !icon.contains(e.target)) {
-            menu.style.display = 'none';
-        }
-    });
-</script>
-
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
 </body>
 </html>
