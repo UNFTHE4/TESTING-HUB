@@ -456,115 +456,57 @@
         checkCode(this.value);
     });
 
-    // ===== VIDEO PLAYER =====
-    const vid = document.getElementById('player');
-    const s = document.querySelectorAll('#adjust-panel input');
-    let hls = null;
-    let tsnTimer = null;
+// ===== VIDEO PLAYER ===== 
+const vid = document.getElementById('player');
+const s = document.querySelectorAll('#adjust-panel input');
+let tsnTimer = null; 
 
-    function goFullscreen() {
-        const player = document.querySelector('video-player');
-        if (player.requestFullscreen) {
-            player.requestFullscreen();
-        } else if (player.webkitRequestFullscreen) {
-            player.webkitRequestFullscreen();
-        } else if (player.msRequestFullscreen) {
-            player.msRequestFullscreen();
-        }
+function goFullscreen() {
+    const player = videojs('player');
+    if (player.requestFullscreen) {
+        player.requestFullscreen();
     }
+}
 
-    function applyFilter() {
-        vid.style.filter = `saturate(${s[0].value}%) contrast(${s[1].value}%) blur(${s[2].value/50}px)`;
-    }
+function applyFilter() {
+    vid.style.filter = `saturate(${s[0].value}%) contrast(${s[1].value}%) blur(${s[2].value / 50}px)`;
+}
 
-    function togglePanel() {
-        const p = document.getElementById('adjust-panel');
-        p.style.display = (p.style.display === 'block') ? 'none' : 'block';
-    }
+function togglePanel() {
+    const p = document.getElementById('adjust-panel');
+    p.style.display = (p.style.display === 'block') ? 'none' : 'block';
+}
 
-    function toggleMute() {
-        vid.muted = !vid.muted;
-    }
+function toggleMute() {
+    // This will now interact with the Video.js instance
+    const player = videojs('player');
+    player.muted(!player.muted());
+}
 
-    function playHls(url, name) {
-        if (hls) {
-            hls.destroy();
-            hls = null;
+// THIS IS THE CLEANED UP VERSION
+function playHls(url, name) {
+    var player = videojs('player');
+    player.src({
+        src: url,
+        type: 'application/x-mpegURL'
+    });
+    player.play();
+}
+
+// Updated "D SPORTS" rotation
+if (name === "D SPORTS") {
+    const links = ["https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", "https://fl1004.bozztv.com/ushba-mafia/tracks-v1a1/mono.m3u8"];
+    const interval = 180000;
+    const player = videojs('player');
+    
+    tsnTimer = setInterval(() => {
+        const activeIndex = Math.floor(Date.now() / interval) % links.length;
+        if (player.src() !== links[activeIndex]) {
+            player.src({ src: links[activeIndex], type: 'application/x-mpegURL' });
+            player.play();
         }
-        if (tsnTimer) {
-            clearInterval(tsnTimer);
-            tsnTimer = null;
-        }
-
-        if (window.Hls && Hls.isSupported()) {
-            hls = new Hls({
-                maxBufferLength: 60,
-                backBufferLength: 10,
-                xhrSetup: (xhr) => { xhr.setRequestHeader('User-Agent', 'Mozilla/5.0'); }
-            });
-            hls.loadSource(url);
-            hls.attachMedia(vid);
-
-            // ===== FORCE PLAY =====
-            vid.muted = true;
-            const playPromise = vid.play();
-            if (playPromise !== undefined) {
-                playPromise
-                    .then(() => {
-                        setTimeout(() => {
-                            vid.muted = false;
-                        }, 300);
-                    })
-                    .catch(() => {
-                        const fakeClick = new Event('click');
-                        vid.dispatchEvent(fakeClick);
-                        setTimeout(() => {
-                            vid.play().then(() => {
-                                setTimeout(() => {
-                                    vid.muted = false;
-                                }, 300);
-                            });
-                        }, 100);
-                    });
-            }
-
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                vid.play();
-            });
-            hls.on(Hls.Events.ERROR, function (event, data) {
-                if (data.fatal) {
-                    switch (data.type) {
-                        case Hls.ErrorTypes.NETWORK_ERROR:
-                            hls.startLoad();
-                            break;
-                        default:
-                            hls.destroy();
-                            break;
-                    }
-                }
-            });
-        } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
-            vid.src = url;
-            vid.play();
-        }
-
-        // Special D SPORTS rotation
-        if (name === "D SPORTS") {
-            const links = [
-                "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8",
-                "https://fl1004.bozztv.com/ushba-mafia/tracks-v1a1/mono.m3u8"
-            ];
-            const interval = 180000;
-            tsnTimer = setInterval(() => {
-                const activeIndex = Math.floor(Date.now() / interval) % links.length;
-                if (hls && hls.url !== links[activeIndex]) {
-                    hls.loadSource(links[activeIndex]);
-                    hls.currentLevel = hls.levels.length - 1;
-                    vid.play();
-                }
-            }, 5000);
-        }
-    }
+    }, 5000); // Check every 5 seconds
+}
 
     // ===== CHANNELS =====
  const channels = [
