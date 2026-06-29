@@ -566,15 +566,15 @@ function playStream(url, name) {
     // Hide placeholder
     document.getElementById('unf-placeholder').style.display = 'none';
 
-    // 1. Always cleanup existing players/timers before starting a new one
+    // 1. Cleanup
     if (hls) { hls.destroy(); hls = null; }
     if (tsnTimer) { clearInterval(tsnTimer); tsnTimer = null; }
-    
-    // 2. Handle M3U8 (HLS)
+
+    // 2. M3U8 Logic
     if (url.includes('.m3u8')) {
         if (window.Hls && Hls.isSupported()) {
             hls = new Hls({
-                maxBufferLength: 500, // Updated to your "Pro" buffer setting
+                maxBufferLength: 500,
                 backBufferLength: 10,
                 xhrSetup: (xhr) => { xhr.setRequestHeader('User-Agent', 'Mozilla/5.0'); }
             });
@@ -588,9 +588,12 @@ function playStream(url, name) {
                     hls.destroy();
                 }
             });
+        } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+            vid.src = url;
+            vid.play();
         }
     } 
-    // 3. Handle MPD (DASH)
+    // 3. MPD Logic
     else if (url.includes('.mpd')) {
         if (typeof dashjs !== 'undefined') {
             var player = dashjs.MediaPlayer().create();
@@ -599,30 +602,21 @@ function playStream(url, name) {
             console.error("dash.js not loaded");
         }
     }
-});
-        } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
-            vid.src = url;
-            vid.play();
-        }
 
-        // Special D SPORTS rotation
-        if (name === "D SPORTS") {
-            const links = [
-                "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8",
-                "https://fl1004.bozztv.com/ushba-mafia/tracks-v1a1/mono.m3u8"
-            ];
-            const interval = 180000;
-            tsnTimer = setInterval(() => {
-                const activeIndex = Math.floor(Date.now() / interval) % links.length;
-                if (hls && hls.url !== links[activeIndex]) {
-                    hls.loadSource(links[activeIndex]);
-                    hls.currentLevel = hls.levels.length - 1;
-                    vid.play();
-                }
-            }, 5000);
-        }
+    // 4. Special D SPORTS rotation
+    if (name === "D SPORTS") {
+        const links = ["https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", "https://fl1004.bozztv.com/ushba-mafia/tracks-v1a1/mono.m3u8"];
+        const interval = 180000;
+        tsnTimer = setInterval(() => {
+            const activeIndex = Math.floor(Date.now() / interval) % links.length;
+            if (hls && hls.url !== links[activeIndex]) {
+                hls.loadSource(links[activeIndex]);
+                hls.currentLevel = hls.levels.length - 1;
+                vid.play();
+            }
+        }, 5000);
     }
-
+}
     // ===== CHANNELS =====
     const channels = [
         { name: "T SPORTS", url: "https://tv.emnetbd.com/flussonic/Tsports1/tracks-v1a1/mono.m3u8", lang: "BAN/ENG", status: "online" },
