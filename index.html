@@ -307,48 +307,48 @@
             width: 100%;
         }
 
-        /* ===== CHAT BOX ===== */
+        /* ===== DEADSIMPLECHAT ===== */
         #chat-overlay {
             display: none;
             position: fixed;
-            bottom: 80px;
-            right: 15px;
-            width: 320px;
-            max-height: 400px;
-            background: rgba(17, 20, 26, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--mint);
-            border-radius: 16px;
-            padding: 10px;
-            z-index: 3000;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.9);
-            flex-direction: column;
+            z-index: 9999;
+            background: transparent;
+            pointer-events: none;
         }
-        #chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            color: var(--mint);
-            font-weight: bold;
-            padding: 0 5px;
-        }
-        #chat-header i { cursor: pointer; color: #888; }
-        #chat-iframe-container {
-            flex: 1;
-            width: 100%;
-            border-radius: 10px;
-            overflow: hidden;
-            background: #000;
-            height: 100%;
-        }
-        #chat-iframe-container iframe {
+
+        #chat-overlay iframe {
             width: 100%;
             height: 100%;
             border: none;
+            pointer-events: auto;
+            border-radius: 12px;
+            background: #11141a;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.8);
         }
-        @media (max-width: 480px) {
-            #chat-overlay { width: 280px; right: 10px; bottom: 70px; }
+
+        /* Desktop: floating on the left */
+        @media (min-width: 900px) {
+            #chat-overlay {
+                top: 120px;
+                left: 20px;
+                width: 320px;
+                height: 400px;
+                border-radius: 12px;
+            }
+        }
+
+        /* Mobile: bottom half of screen */
+        @media (max-width: 899px) {
+            #chat-overlay {
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 50vh;
+                border-radius: 16px 16px 0 0;
+            }
+            #chat-overlay iframe {
+                border-radius: 16px 16px 0 0;
+            }
         }
 
         /* ===== FOOTER ===== */
@@ -483,6 +483,7 @@
             </div>
             <span id="status-text">SELECT CHANNEL</span>
             <div class="right">
+                <i class="fa-solid fa-comment-dots" onclick="toggleChat()" style="cursor:pointer; color:var(--mint);"></i>
                 <i class="fa-solid fa-sliders" onclick="togglePanel()"></i>
                 <i class="fa-solid fa-volume-up" id="vol-icon" onclick="toggleMute()"></i>
                 <i class="fa-solid fa-expand" onclick="goFullscreen()"></i>
@@ -514,15 +515,9 @@
     </div>
 </div>
 
-<!-- ===== CHAT OVERLAY ===== -->
+<!-- ===== DEADSIMPLECHAT OVERLAY ===== -->
 <div id="chat-overlay">
-    <div id="chat-header">
-        <span>💬 UNF Live Chat</span>
-        <i class="fa-solid fa-times" onclick="toggleChat()"></i>
-    </div>
-    <div id="chat-iframe-container">
-        <iframe src="https://www5.cbox.ws/box/?boxid=964013&boxtag=acmmE3&tid=1&tkey=c7c6abffcf6efd6f" allowtransparency="yes" allow="autoplay" frameborder="0" marginheight="0" marginwidth="0" scrolling="auto"></iframe>
-    </div>
+    <iframe src="https://deadsimplechat.com/_x5KSSXCX" allow="camera; microphone; fullscreen; autoplay"></iframe>
 </div>
 
 <script>
