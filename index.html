@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex, nofollow">
     <title>UNF STREAM HUB</title>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/webp" href="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp">
-    
-    <!-- ===== NEW VIDEO.JS PLAYER CSS ===== -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@videojs/html/cdn/video-minimal-ui.css" />
-    
-    <!-- ===== NEW VIDEO.JS PLAYER MODULE ===== -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@videojs/html/cdn/video-minimal-ui.js"></script>
 
+    <!-- ✅ Video.JS Core CSS -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+
+    <!-- ✅ Video.JS Core JS -->
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+    <!-- ✅ Video.JS HLS Plugin (Required for .m3u8 streams) -->
+    <script src="https://cdn.jsdelivr.net/npm/@videojs/http-streaming@3.0.0/dist/videojs-http-streaming.min.js"></script>
+
+    <!-- Your existing styles below... -->
     <style>
         /* ===== RESET ===== */
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -388,220 +393,33 @@
         <div onclick="reportError()">🚨 Report Error</div>
     </div>
 
-    <!-- VIDEO HEADER -->
-    <div id="video-header">
-        <div id="status-overlay">
-            <img id="buffer-gif" src="https://media4.giphy.com/media/aBW9YyswmydvlKf7ZU/giphy.gif">
-            <div id="error-msg">IF STREAM IS NOT WORKING PLEASE REPORT AND LET US KNOW</div>
-        </div>
-
-        <!-- ===== NEW VIDEO.JS PLAYER ===== -->
-        <video-player>
-            <media-container class="media-minimal-skin media-minimal-skin--video">
-                <video id="player" playsinline></video>
-
-                <media-poster>
-                    <img src="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp" />
-                </media-poster>
-
-                <media-buffering-indicator class="media-buffering-indicator">
-                    <media-icon name="spinner" family="minimal" class="media-icon"></media-icon>
-                </media-buffering-indicator>
-
-                <media-error-dialog class="media-error">
-                    <div class="media-error__dialog">
-                        <div class="media-error__content">
-                            <media-alert-dialog-title class="media-error__title">Stream Error</media-alert-dialog-title>
-                            <media-alert-dialog-description class="media-error__description">Please try another channel or report the issue.</media-alert-dialog-description>
-                        </div>
-                        <div class="media-error__actions">
-                            <media-alert-dialog-close class="media-button media-button--primary">OK</media-alert-dialog-close>
-                        </div>
-                    </div>
-                </media-error-dialog>
-
-                <media-controls class="media-controls">
-                    <media-tooltip-group>
-                        <div class="media-button-group">
-                            <media-play-button commandfor="play-tooltip" class="media-button media-button--subtle media-button--icon media-button--play">
-                                <media-icon name="restart" family="minimal" class="media-icon media-icon--restart"></media-icon>
-                                <media-icon name="play" family="minimal" class="media-icon media-icon--play"></media-icon>
-                                <media-icon name="pause" family="minimal" class="media-icon media-icon--pause"></media-icon>
-                            </media-play-button>
-                            <media-tooltip id="play-tooltip" side="top" class="media-tooltip"></media-tooltip>
-
-                            <media-seek-button commandfor="seek-backward-tooltip" seconds="-10" class="media-button media-button--subtle media-button--icon media-button--seek">
-                                <span class="media-icon__container">
-                                    <media-icon name="seek" family="minimal" class="media-icon media-icon--flipped"></media-icon>
-                                    <span class="media-icon__label">10</span>
-                                </span>
-                            </media-seek-button>
-                            <media-tooltip id="seek-backward-tooltip" side="top" class="media-tooltip"></media-tooltip>
-
-                            <media-seek-button commandfor="seek-forward-tooltip" seconds="10" class="media-button media-button--subtle media-button--icon media-button--seek">
-                                <span class="media-icon__container">
-                                    <media-icon name="seek" family="minimal" class="media-icon"></media-icon>
-                                    <span class="media-icon__label">10</span>
-                                </span>
-                            </media-seek-button>
-                            <media-tooltip id="seek-forward-tooltip" side="top" class="media-tooltip"></media-tooltip>
-                        </div>
-
-                        <div class="media-time-controls">
-                            <media-time-group class="media-time-group">
-                                <media-time type="current" class="media-time media-time--current"></media-time>
-                                <media-time-separator class="media-time-separator"></media-time-separator>
-                                <media-time type="duration" class="media-time media-time--duration"></media-time>
-                            </media-time-group>
-
-                            <media-time-slider class="media-slider">
-                                <media-slider-track class="media-slider__track">
-                                    <media-slider-fill class="media-slider__fill"></media-slider-fill>
-                                    <media-slider-buffer class="media-slider__buffer"></media-slider-buffer>
-                                </media-slider-track>
-                                <media-slider-thumb class="media-slider__thumb"></media-slider-thumb>
-
-                                <div class="media-preview media-slider__preview">
-                                    <div class="media-preview__thumbnail-wrapper">
-                                        <media-slider-thumbnail class="media-preview__thumbnail"></media-slider-thumbnail>
-                                    </div>
-                                    <media-slider-value type="pointer" class="media-time media-preview__time"></media-slider-value>
-                                    <media-icon name="spinner" family="minimal" class="media-preview__spinner media-icon"></media-icon>
-                                </div>
-                            </media-time-slider>
-                        </div>
-
-                        <div class="media-button-group">
-                            <media-playback-rate-menu-trigger commandfor="playback-rate-menu" class="media-button media-button--subtle media-button--icon media-button--playback-rate"></media-playback-rate-menu-trigger>
-                            <media-playback-rate-menu id="playback-rate-menu" side="top" align="center" class="media-popover media-menu media-menu--playback-rate">
-                                <media-playback-rate-options class="media-menu__group">
-                                    <template>
-                                        <media-menu-radio-item class="media-menu__item">
-                                            <span data-part="label"></span>
-                                            <media-menu-item-indicator force-mount class="media-menu__indicator">
-                                                <media-icon name="check" family="minimal" class="media-icon"></media-icon>
-                                            </media-menu-item-indicator>
-                                        </media-menu-radio-item>
-                                    </template>
-                                </media-playback-rate-options>
-                            </media-playback-rate-menu>
-
-                            <media-mute-button commandfor="video-volume-popover" class="media-button media-button--subtle media-button--icon media-button--mute">
-                                <media-icon name="volume-off" family="minimal" class="media-icon media-icon--volume-off"></media-icon>
-                                <media-icon name="volume-low" family="minimal" class="media-icon media-icon--volume-low"></media-icon>
-                                <media-icon name="volume-high" family="minimal" class="media-icon media-icon--volume-high"></media-icon>
-                            </media-mute-button>
-
-                            <media-popover id="video-volume-popover" open-on-hover delay="200" close-delay="100" side="top" class="media-popover media-popover--volume">
-                                <media-volume-slider class="media-slider" orientation="vertical" thumb-alignment="edge">
-                                    <media-slider-track class="media-slider__track">
-                                        <media-slider-fill class="media-slider__fill"></media-slider-fill>
-                                    </media-slider-track>
-                                    <media-slider-thumb class="media-slider__thumb media-slider__thumb--persistent"></media-slider-thumb>
-                                </media-volume-slider>
-                            </media-popover>
-
-                            <media-captions-button commandfor="captions-tooltip" class="media-button media-button--subtle media-button--icon media-button--captions">
-                                <media-icon name="captions-off" family="minimal" class="media-icon media-icon--captions-off"></media-icon>
-                                <media-icon name="captions-on" family="minimal" class="media-icon media-icon--captions-on"></media-icon>
-                            </media-captions-button>
-                            <media-tooltip id="captions-tooltip" side="top" class="media-tooltip"></media-tooltip>
-
-                            <media-cast-button commandfor="cast-tooltip" class="media-button media-button--subtle media-button--icon media-button--cast">
-                                <media-icon name="cast-enter" family="minimal" class="media-icon media-icon--cast-enter"></media-icon>
-                                <media-icon name="cast-exit" family="minimal" class="media-icon media-icon--cast-exit"></media-icon>
-                            </media-cast-button>
-                            <media-tooltip id="cast-tooltip" side="top" class="media-tooltip"></media-tooltip>
-
-                            <media-pip-button commandfor="pip-tooltip" class="media-button media-button--subtle media-button--icon media-button--pip">
-                                <media-icon name="pip-enter" family="minimal" class="media-icon media-icon--pip-enter"></media-icon>
-                                <media-icon name="pip-exit" family="minimal" class="media-icon media-icon--pip-exit"></media-icon>
-                            </media-pip-button>
-                            <media-tooltip id="pip-tooltip" side="top" class="media-tooltip"></media-tooltip>
-
-                            <media-fullscreen-button commandfor="fullscreen-tooltip" class="media-button media-button--subtle media-button--icon media-button--fullscreen">
-                                <media-icon name="fullscreen-enter" family="minimal" class="media-icon media-icon--fullscreen-enter"></media-icon>
-                                <media-icon name="fullscreen-exit" family="minimal" class="media-icon media-icon--fullscreen-exit"></media-icon>
-                            </media-fullscreen-button>
-                            <media-tooltip id="fullscreen-tooltip" side="top" class="media-tooltip"></media-tooltip>
-                        </div>
-                    </media-tooltip-group>
-                </media-controls>
-
-                <div class="media-overlay"></div>
-
-                <!-- Hotkeys -->
-                <media-hotkey keys="Space" action="togglePaused"></media-hotkey>
-                <media-hotkey keys="k" action="togglePaused"></media-hotkey>
-                <media-hotkey keys="m" action="toggleMuted"></media-hotkey>
-                <media-hotkey keys="f" action="toggleFullscreen"></media-hotkey>
-                <media-hotkey keys="c" action="toggleSubtitles"></media-hotkey>
-                <media-hotkey keys="i" action="togglePictureInPicture"></media-hotkey>
-                <media-hotkey keys="ArrowRight" action="seekStep" value="5"></media-hotkey>
-                <media-hotkey keys="ArrowLeft" action="seekStep" value="-5"></media-hotkey>
-                <media-hotkey keys="l" action="seekStep" value="10"></media-hotkey>
-                <media-hotkey keys="j" action="seekStep" value="-10"></media-hotkey>
-                <media-hotkey keys="ArrowUp" action="volumeStep" value="0.05"></media-hotkey>
-                <media-hotkey keys="ArrowDown" action="volumeStep" value="-0.05"></media-hotkey>
-                <media-hotkey keys="0-9" action="seekToPercent"></media-hotkey>
-                <media-hotkey keys="Home" action="seekToPercent" value="0"></media-hotkey>
-                <media-hotkey keys="End" action="seekToPercent" value="100"></media-hotkey>
-                <media-hotkey keys=">" action="speedUp"></media-hotkey>
-                <media-hotkey keys="<" action="speedDown"></media-hotkey>
-
-                <!-- Gestures -->
-                <media-gesture type="tap" action="togglePaused" pointer="mouse" region="center"></media-gesture>
-                <media-gesture type="tap" action="toggleControls" pointer="touch"></media-gesture>
-                <media-gesture type="doubletap" action="seekStep" value="-10" region="left"></media-gesture>
-                <media-gesture type="doubletap" action="toggleFullscreen" region="center"></media-gesture>
-                <media-gesture type="doubletap" action="seekStep" value="10" region="right"></media-gesture>
-
-                <!-- Input Feedback -->
-                <media-status-announcer></media-status-announcer>
-                <div class="media-input-feedback">
-                    <media-volume-indicator hidden class="media-input-feedback-island media-input-feedback-island--volume">
-                        <media-volume-indicator-fill class="media-input-feedback-island__content">
-                            <media-icon name="volume-high" family="minimal" class="media-icon media-icon--volume-high"></media-icon>
-                            <media-icon name="volume-low" family="minimal" class="media-icon media-icon--volume-low"></media-icon>
-                            <media-icon name="volume-off" family="minimal" class="media-icon media-icon--volume-off"></media-icon>
-                            <div class="media-input-feedback-island__progress" aria-hidden="true"></div>
-                            <media-volume-indicator-value class="media-input-feedback-island__value"></media-volume-indicator-value>
-                        </media-volume-indicator-fill>
-                    </media-volume-indicator>
-
-                    <media-status-indicator hidden actions="toggleSubtitles toggleFullscreen togglePictureInPicture" class="media-input-feedback-island media-input-feedback-island--status">
-                        <div class="media-input-feedback-island__content">
-                            <media-icon name="captions-on" family="minimal" class="media-icon media-icon--captions-on"></media-icon>
-                            <media-icon name="captions-off" family="minimal" class="media-icon media-icon--captions-off"></media-icon>
-                            <media-icon name="fullscreen-enter" family="minimal" class="media-icon media-icon--fullscreen-enter"></media-icon>
-                            <media-icon name="fullscreen-exit" family="minimal" class="media-icon media-icon--fullscreen-exit"></media-icon>
-                            <media-icon name="pip-enter" family="minimal" class="media-icon media-icon--pip-enter"></media-icon>
-                            <media-icon name="pip-exit" family="minimal" class="media-icon media-icon--pip-exit"></media-icon>
-                            <media-status-indicator-value class="media-input-feedback-island__value"></media-status-indicator-value>
-                        </div>
-                    </media-status-indicator>
-
-                    <media-seek-indicator hidden class="media-input-feedback-bubble">
-                        <media-icon name="chevron" family="minimal" class="media-icon media-icon--seek"></media-icon>
-                        <media-seek-indicator-value class="media-time"></media-seek-indicator-value>
-                    </media-seek-indicator>
-
-                    <media-status-indicator hidden actions="togglePaused" class="media-input-feedback-bubble">
-                        <media-icon name="play" family="minimal" class="media-icon media-icon--play"></media-icon>
-                        <media-icon name="pause" family="minimal" class="media-icon media-icon--pause"></media-icon>
-                    </media-status-indicator>
-                </div>
-            </media-container>
-        </video-player>
-
-        <!-- Adjust Panel (unchanged) -->
-        <div id="adjust-panel">
-            <div>Saturation: <input max="200" min="0" oninput="applyFilter()" type="range" value="100"></div>
-            <div>Contrast: <input max="150" min="50" oninput="applyFilter()" type="range" value="100"></div>
-            <div>Sharpness: <input max="100" min="0" oninput="applyFilter()" type="range" value="0"></div>
-        </div>
-        <div class="grid" id="channel-grid"></div>
+<!-- ===== VIDEO HEADER ===== -->
+<div id="video-header">
+    <div id="status-overlay">
+        <img id="buffer-gif" src="https://media4.giphy.com/media/aBW9YyswmydvlKf7ZU/giphy.gif">
+        <div id="error-msg">IF STREAM IS NOT WORKING PLEASE REPORT AND LET US KNOW</div>
     </div>
+
+    <!-- ✅ NEW Video.JS Player -->
+    <video
+        id="player"
+        class="video-js vjs-default-skin vjs-big-play-centered"
+        controls
+        preload="auto"
+        width="100%"
+        height="100%"
+        style="width: 100%; height: auto; aspect-ratio: 16/9;"
+        playsinline
+    ></video>
+
+    <!-- ✅ Adjust Panel (unchanged) -->
+    <div id="adjust-panel">
+        <div>Saturation: <input max="200" min="0" oninput="applyFilter()" type="range" value="100"></div>
+        <div>Contrast: <input max="150" min="50" oninput="applyFilter()" type="range" value="100"></div>
+        <div>Sharpness: <input max="100" min="0" oninput="applyFilter()" type="range" value="0"></div>
+    </div>
+    <div class="grid" id="channel-grid"></div>
+</div>
 
     <!-- FOOTER -->
     <div class="footer">
