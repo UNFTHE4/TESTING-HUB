@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/webp" href="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
+    <!-- dash.js is kept, but only used if you actually have .mpd links -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dashjs/4.7.0/dash.min.js"></script>
     <style>
         /* ===== RESET ===== */
@@ -562,61 +563,73 @@
         document.getElementById('vol-icon').className = vid.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-up';
     }
 
-function playStream(url, name) {
-    // Hide placeholder
-    document.getElementById('unf-placeholder').style.display = 'none';
+    // ===== NEW HYBRID STREAM FUNCTION =====
+    function playStream(url, name) {
+        // Hide placeholder
+        document.getElementById('unf-placeholder').style.display = 'none';
 
-    // 1. Cleanup
-    if (hls) { hls.destroy(); hls = null; }
-    if (tsnTimer) { clearInterval(tsnTimer); tsnTimer = null; }
+        // 1. Cleanup
+        if (hls) { hls.destroy(); hls = null; }
+        if (tsnTimer) { clearInterval(tsnTimer); tsnTimer = null; }
 
-    // 2. M3U8 Logic
-    if (url.includes('.m3u8')) {
-        if (window.Hls && Hls.isSupported()) {
-            hls = new Hls({
-                maxBufferLength: 500,
-                backBufferLength: 10,
-                xhrSetup: (xhr) => { xhr.setRequestHeader('User-Agent', 'Mozilla/5.0'); }
-            });
-            hls.loadSource(url);
-            hls.attachMedia(vid);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => { vid.play(); });
-            hls.on(Hls.Events.ERROR, (event, data) => {
-                if (data.fatal && data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                    hls.startLoad();
-                } else if (data.fatal) {
-                    hls.destroy();
-                }
-            });
-        } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+        // 2. M3U8 Logic
+        if (url.includes('.m3u8')) {
+            if (window.Hls && Hls.isSupported()) {
+                hls = new Hls({
+                    maxBufferLength: 500,
+                    backBufferLength: 10,
+                    xhrSetup: (xhr) => { xhr.setRequestHeader('User-Agent', 'Mozilla/5.0'); }
+                });
+                hls.loadSource(url);
+                hls.attachMedia(vid);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => { vid.play(); });
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal && data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                        hls.startLoad();
+                    } else if (data.fatal) {
+                        hls.destroy();
+                    }
+                });
+            } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+                vid.src = url;
+                vid.play();
+            }
+        } 
+        // 3. MPD Logic (dash.js)
+        else if (url.includes('.mpd')) {
+            if (typeof dashjs !== 'undefined') {
+                // Use a different variable name to avoid conflict with the <video> element
+                var dashPlayer = dashjs.MediaPlayer().create();
+                dashPlayer.initialize(vid, url, true);
+            } else {
+                console.error("dash.js not loaded");
+                alert("This stream requires dash.js, but it failed to load.");
+            }
+        }
+        // 4. Direct .ts or .mp4 fallback
+        else {
             vid.src = url;
             vid.play();
         }
-    } 
-    // 3. MPD Logic
-    else if (url.includes('.mpd')) {
-        if (typeof dashjs !== 'undefined') {
-            var player = dashjs.MediaPlayer().create();
-            player.initialize(vid, url, true);
-        } else {
-            console.error("dash.js not loaded");
+
+        // 5. Special D SPORTS rotation
+        if (name === "D SPORTS") {
+            const links = [
+                "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", 
+                "https://fl1004.bozztv.com/ushba-mafia/tracks-v1a1/mono.m3u8"
+            ];
+            const interval = 180000;
+            tsnTimer = setInterval(() => {
+                const activeIndex = Math.floor(Date.now() / interval) % links.length;
+                if (hls && hls.url !== links[activeIndex]) {
+                    hls.loadSource(links[activeIndex]);
+                    hls.currentLevel = hls.levels.length - 1;
+                    vid.play();
+                }
+            }, 5000);
         }
     }
 
-    // 4. Special D SPORTS rotation
-    if (name === "D SPORTS") {
-        const links = ["https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", "https://fl1004.bozztv.com/ushba-mafia/tracks-v1a1/mono.m3u8"];
-        const interval = 180000;
-        tsnTimer = setInterval(() => {
-            const activeIndex = Math.floor(Date.now() / interval) % links.length;
-            if (hls && hls.url !== links[activeIndex]) {
-                hls.loadSource(links[activeIndex]);
-                hls.currentLevel = hls.levels.length - 1;
-                vid.play();
-            }
-        }, 5000);
-    }
-}
     // ===== CHANNELS =====
     const channels = [
         { name: "T SPORTS", url: "https://tv.emnetbd.com/flussonic/Tsports1/tracks-v1a1/mono.m3u8", lang: "BAN/ENG", status: "online" },
@@ -650,7 +663,8 @@ function playStream(url, name) {
                 document.querySelectorAll('.card').forEach(el => el.classList.remove('active'));
                 card.classList.add('active');
                 document.getElementById('status-text').innerText = c.name;
-                playHls(c.url, c.name);
+                // 👇 FIXED: Call the new function name
+                playStream(c.url, c.name);
             }
         };
         grid.appendChild(card);
@@ -696,7 +710,8 @@ function playStream(url, name) {
         }
         const movie = movieList[0];
         document.getElementById('status-text').innerText = `🎬 ${movie.name}`;
-        playHls(movie.url, movie.name);
+        // 👇 FIXED: Use the new function here too
+        playStream(movie.url, movie.name);
     }
 
     function openRequestMovie() {
