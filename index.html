@@ -6,24 +6,17 @@
     <title>UNF STREAM HUB</title>
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@videojs/http-streaming@3.0.0/dist/videojs-http-streaming.min.js"></script>
+
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:#0b0c10; font-family:sans-serif; color:#fff; }
         
-        /* YouTube Minimalist Floating Player */
-        .video-js { width: 100% !important; aspect-ratio: 16/9; }
-        
-        /* Remove the black bar */
-        .video-js .vjs-control-bar {
-            background: transparent !important;
-            background-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent) !important;
-        }
-        
-        /* Red Progress Bar */
+        /* --- YOUTUBE SKIN OVERRIDES --- */
+        .video-js { width: 100% !important; height: auto !important; aspect-ratio: 16/9; }
+        .video-js .vjs-control-bar { background: rgba(0,0,0,0.85) !important; }
         .video-js .vjs-play-progress { background: #ff0000 !important; }
         .video-js .vjs-slider-bar { background: #ff0000 !important; }
-        
-        /* Circular Play Button */
         .video-js .vjs-big-play-button {
             background: rgba(0,0,0,0.4) !important;
             border: 2px solid white !important;
@@ -32,93 +25,40 @@
             line-height: 60px !important;
             left: 50% !important; top: 50% !important;
             margin-left: -30px !important; margin-top: -30px !important;
+            transition: all 0.2s;
         }
+        .video-js .vjs-big-play-button:hover { background: #ff0000 !important; border-color: #ff0000 !important; }
 
+        /* Your existing theme styles */
         #main-content { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .top-bar { display: flex; justify-content: space-between; padding: 10px; background: #000; border-bottom: 2px solid #00ff66; }
         .grid { display: grid; gap: 10px; padding: 20px 0; grid-template-columns: repeat(4, 1fr); }
         .card { background: #11141a; padding: 15px; border-radius: 8px; cursor: pointer; border: 1px solid #333; }
+        .card:hover { border-color: #00ff66; }
     </style>
 </head>
 <body>
+
     <div id="main-content">
+        <div class="top-bar">
+            <span>UNF STREAM HUB</span>
+            <div id="digital-clock">00:00 PM</div>
+        </div>
+
         <video id="player" class="video-js vjs-big-play-centered" controls preload="auto" playsinline></video>
+
         <div class="grid" id="channel-grid"></div>
     </div>
+
     <script>
         const player = videojs('player');
+
         function playHls(url) {
             player.src({ src: url, type: 'application/x-mpegURL' });
             player.play();
         }
+
         const channels = [
-            { name: "T SPORTS", url: "https://tv.emnetbd.com/flussonic/Tsports1/tracks-v1a1/mono.m3u8" },
-            { name: "SKY SPORTS F1", url: "https://xstm.250909.cc/live/SPORTSFLUX-POOL-20acb0a9c8/5ffe6c552a88/1037.m3u8" },
-            { name: "beIN SPORTS 1", url: "https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8" },
-            { name: "DAZN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8" }
-        ];
-        const grid = document.getElementById('channel-grid');
-        channels.forEach(c => {
-            let card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `<b>${c.name}</b>`;
-            card.onclick = () => playHls(c.url);
-            grid.appendChild(card);
-        });
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNF STREAM HUB</title>
-    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
-    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body { background:#0b0c10; font-family:sans-serif; color:#fff; }
-        
-        /* YouTube Minimalist Floating Player */
-        .video-js { width: 100% !important; aspect-ratio: 16/9; }
-        
-        /* Remove the black bar */
-        .video-js .vjs-control-bar {
-            background: transparent !important;
-            background-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent) !important;
-        }
-        
-        /* Red Progress Bar */
-        .video-js .vjs-play-progress { background: #ff0000 !important; }
-        .video-js .vjs-slider-bar { background: #ff0000 !important; }
-        
-        /* Circular Play Button */
-        .video-js .vjs-big-play-button {
-            background: rgba(0,0,0,0.4) !important;
-            border: 2px solid white !important;
-            border-radius: 50% !important;
-            width: 60px !important; height: 60px !important;
-            line-height: 60px !important;
-            left: 50% !important; top: 50% !important;
-            margin-left: -30px !important; margin-top: -30px !important;
-        }
-
-        #main-content { max-width: 1000px; margin: 0 auto; padding: 20px; }
-        .grid { display: grid; gap: 10px; padding: 20px 0; grid-template-columns: repeat(4, 1fr); }
-        .card { background: #11141a; padding: 15px; border-radius: 8px; cursor: pointer; border: 1px solid #333; }
-    </style>
-</head>
-<body>
-    <div id="main-content">
-        <video id="player" class="video-js vjs-big-play-centered" controls preload="auto" playsinline></video>
-        <div class="grid" id="channel-grid"></div>
-    </div>
-    <script>
-        const player = videojs('player');
-        function playHls(url) {
-            player.src({ src: url, type: 'application/x-mpegURL' });
-            player.play();
-        }
- const channels = [
     {name: "T SPORTS", url: "https://tv.emnetbd.com/flussonic/Tsports1/tracks-v1a1/mono.m3u8", lang: "BAN/ENG", status: "online"},
     {name: "SKY SPORTS F1", url: "https://xstm.250909.cc/live/SPORTSFLUX-POOL-20acb0a9c8/5ffe6c552a88/1037.m3u8", lang: "ENG", status: "online"},
     {name: "ESPN", url: "https://1nyaler.streamhostingcdn.top/stream/97/index.m3u8", lang: "DUT", status: "offline"},
@@ -133,6 +73,7 @@
     {name: "TOFFEE", url: "https://sm-monirul.top/tof/live/toffee4/index.m3u8", lang: "ENG", status: "online"},
     {name: "WIN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", lang: "UNK", status: "online"}
 ];
+
         const grid = document.getElementById('channel-grid');
         channels.forEach(c => {
             let card = document.createElement('div');
@@ -141,6 +82,12 @@
             card.onclick = () => playHls(c.url);
             grid.appendChild(card);
         });
+
+        function updateClock() {
+            document.getElementById('digital-clock').innerText = new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true});
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
     </script>
 </body>
 </html>
