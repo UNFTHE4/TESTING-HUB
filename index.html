@@ -8,7 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="icon" type="image/webp" href="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dashjs/4.7.0/dash.min.js"></script>
     <style>
         /* ===== RESET ===== */
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -543,7 +542,6 @@
     const s = document.querySelectorAll('#adjust-panel input');
     let hls = null;
     let tsnTimer = null;
-    let dashPlayer = null;
 
     function goFullscreen() {
         if (vid.requestFullscreen) vid.requestFullscreen();
@@ -570,7 +568,6 @@
         // 1. Cleanup
         if (hls) { hls.destroy(); hls = null; }
         if (tsnTimer) { clearInterval(tsnTimer); tsnTimer = null; }
-        if (dashPlayer) { dashPlayer.destroy(); dashPlayer = null; }
 
         // 2. M3U8 Logic (HLS.js)
         if (url.includes('.m3u8')) {
@@ -594,29 +591,15 @@
                 vid.src = url;
                 vid.play();
             }
-        } 
-        // 3. MPD Logic (dash.js) — silent fallback
-        else if (url.includes('.mpd')) {
-            if (typeof dashjs !== 'undefined') {
-                try {
-                    dashPlayer = dashjs.MediaPlayer().create();
-                    dashPlayer.initialize(vid, url, true);
-                } catch (e) {
-                    console.warn("MPD failed to play:", e);
-                }
-            } else {
-                console.warn("dash.js not loaded, but MPD stream was requested.");
-                vid.src = url;
-                vid.play();
-            }
         }
-        // 4. Direct .ts or .mp4 fallback
+        // 3. Direct .ts or .mp4 or .php (native fallback)
         else {
+            // If it's .ts, .mp4, or even a PHP stream proxy, just let the browser try it natively
             vid.src = url;
             vid.play();
         }
 
-        // 5. Special D SPORTS rotation
+        // 4. Special D SPORTS rotation
         if (name === "D SPORTS") {
             const links = [
                 "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", 
@@ -651,7 +634,7 @@
         { name: "TOFFEE", url: "https://sm-monirul.top/tof/live/toffee4/index.m3u8", lang: "ENG", status: "online" }, 
         { name: "WIN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", lang: "SPA", status: "online" },
         { name: "SPORT TV", url: "https://1nyaler.streamhostingcdn.top/stream/33/index.m3u8", lang: "SPA", status: "online" },
-        { name: "TEST TV", url: "https://qp-pldt-live-grp-13-prod.akamaized.net/out/u/dr_spotv2hd.mpd", lang: "MPD", status: "online" }
+        { name: "TEST TS", url: "http://starhub.pro/live/farhat-3379/67897-913379/742610.ts", lang: "TS", status: "online" } // Replace with real .ts link later
     ];
 
     const grid = document.getElementById('channel-grid');
