@@ -592,14 +592,18 @@
                 vid.play();
             }
         }
-        // 3. Direct .ts or .mp4 or .php (native fallback)
+        // 3. MP4 direct fallback
+        else if (url.includes('.mp4')) {
+            vid.src = url;
+            vid.play();
+        }
+        // 4. Any other format: try native playback anyway
         else {
-            // If it's .ts, .mp4, or even a PHP stream proxy, just let the browser try it natively
             vid.src = url;
             vid.play();
         }
 
-        // 4. Special D SPORTS rotation
+        // 5. Special D SPORTS rotation
         if (name === "D SPORTS") {
             const links = [
                 "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", 
@@ -619,22 +623,26 @@
 
     // ===== CHANNELS =====
     const channels = [
-        { name: "T SPORTS", url: "https://tv.emnetbd.com/flussonic/Tsports1/tracks-v1a1/mono.m3u8", lang: "BAN/ENG", status: "online" },
+        { name: "T SPORTS", url: "https://smartbox.digital/stream/T-SPORTS/playlist.m3u8", lang: "BAN/ENG", status: "online" },
+        { name: "SKY SPORTS MAIN EVENT", url: "https://smartbox.digital/stream-load/SKY%20SPORTS%20MAIN%20EVENT%20HD/playlist.m3u8", lang: "ENG", status: "online" },
+        { name: "SKY SPORTS FOOTBALL", url: "https://smartbox.digital/stream-load/skysports_football/playlist.m3u8", lang: "ENG", status: "online" },
+        { name: "SKY SPORTS CRICKET", url: "https://smartbox.digital/stream-load/skycricket/playlist.m3u8", lang: "ENG", status: "online" },
         { name: "SKY SPORTS F1", url: "https://xstm.250909.cc/live/SPORTSFLUX-POOL-20acb0a9c8/5ffe6c552a88/1037.m3u8", lang: "ENG", status: "online" },
         { name: "ESPN", url: "https://1nyaler.streamhostingcdn.top/stream/97/index.m3u8", lang: "DUT", status: "offline" }, 
         { name: "beIN SPORTS 1", url: "https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8", lang: "FRE", status: "online" },
+        { name: "beIN SPORTS 1 MAX", url: "https://edge22.776740.ir.cdn.ir/hls2/sport.m3u8", lang: "ARA", status: "online" },
         { name: "beIN SPORTS XTRA", url: "https://bein-esp-xumo.amagi.tv/playlistR1080p.m3u8", lang: "UNK", status: "online" },
         { name: "DAZN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/52/index.m3u8", lang: "SPA", status: "online" },
         { name: "DAZN F1", url: "https://tv.topmediatv.net:25463/live/TopMediaWeb/bOteTR8ED1/374.m3u8", lang: "SPA", status: "online" },
-        { name: "SKY SPORTS F1 UHD", url: "https://inproviszon.st/sky-sports-f1-uhd.m3u8", lang: "ENG", status: "online" },
+        { name: "SKY SPORTS F1 UHD", url: "https://inproviszon.st/sky-sports-f1-uhd.m3u8", lang: "ENG", status: "offline" },
         { name: "FOX SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/26/index.m3u8", lang: "ENG", status: "online" },
         { name: "FOX", url: "https://d1jzu95oc8fgt3.cloudfront.net/FOX_Sports720p.m3u8", lang: "ENG", status: "online" },
         { name: "D SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", lang: "ENG", status: "online" },
-        { name: "TSN 1", url: "http://s.rocketdns.info:8080/live/monstercable/Dq6jjknxCr/3146.ts", lang: "ENG", status: "online" },
-        { name: "TOFFEE", url: "https://sm-monirul.top/tof/live/toffee4/index.m3u8", lang: "ENG", status: "online" }, 
+        { name: "TSN 1", url: "https://pub-098b280041274cf5929f5e19cfc8ac67.r2.dev/en1/index.m3u8", lang: "ENG", status: "offline" },
+        { name: "TOFFEE", url: "https://sm-monirul.top/tof/live/toffee4/index.m3u8", lang: "ENG", status: "offline" }, 
         { name: "WIN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", lang: "SPA", status: "online" },
         { name: "SPORT TV", url: "https://1nyaler.streamhostingcdn.top/stream/33/index.m3u8", lang: "SPA", status: "online" },
-        { name: "TEST TS", url: "https://dfr80qz435crc.cloudfront.net/MNOP/Amagi/Caze/Caze_TV_BR/1080p-vtt/index.m3u8", lang: "TS", status: "online" } // Replace with real .ts link later
+        { name: "koora city", url: "https://am.homom.store/braz1_480/index.m3u8", lang: "weird lang?", status: "offline" }
     ];
 
     const grid = document.getElementById('channel-grid');
