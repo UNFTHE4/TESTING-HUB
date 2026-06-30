@@ -565,11 +565,14 @@
         // Hide placeholder
         document.getElementById('unf-placeholder').style.display = 'none';
 
-        // 1. Cleanup
+        // Cleanup
         if (hls) { hls.destroy(); hls = null; }
         if (tsnTimer) { clearInterval(tsnTimer); tsnTimer = null; }
 
-        // 2. M3U8 Logic (HLS.js)
+        // Find the channel object so we can access its backup URL
+        const channel = channels.find(c => c.name === name);
+
+        // M3U8 Logic (HLS.js)
         if (url.includes('.m3u8')) {
             if (window.Hls && Hls.isSupported()) {
                 hls = new Hls({
@@ -580,11 +583,18 @@
                 hls.loadSource(url);
                 hls.attachMedia(vid);
                 hls.on(Hls.Events.MANIFEST_PARSED, () => { vid.play(); });
+
+                // ===== AUTO-SWITCH TO BACKUP ON ERROR =====
                 hls.on(Hls.Events.ERROR, (event, data) => {
-                    if (data.fatal && data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                        hls.startLoad();
-                    } else if (data.fatal) {
-                        hls.destroy();
+                    if (data.fatal) {
+                        // If a backup exists and we haven't tried it yet
+                        if (channel && channel.backup && url !== channel.backup) {
+                            console.log("🔁 Main stream failed. Switching to backup...");
+                            playStream(channel.backup, name);
+                        } else {
+                            console.error("Stream failed and no backup available.");
+                            document.getElementById('error-msg').style.display = 'block';
+                        }
                     }
                 });
             } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
@@ -592,18 +602,18 @@
                 vid.play();
             }
         }
-        // 3. MP4 direct fallback
+        // MP4 direct fallback
         else if (url.includes('.mp4')) {
             vid.src = url;
             vid.play();
         }
-        // 4. Any other format: try native playback anyway
+        // Any other format
         else {
             vid.src = url;
             vid.play();
         }
 
-        // 5. Special D SPORTS rotation
+        // Special D SPORTS rotation
         if (name === "D SPORTS") {
             const links = [
                 "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", 
@@ -622,29 +632,148 @@
     }
 
     // ===== CHANNELS =====
-    const channels = [
-        { name: "T SPORTS", url: "https://proxy.brhexstudio.com/proxy?p=http%3A%2F%2F114.130.57.233%3A8080%2FT-Sports%2Ftracks-v1a1%2Fmono.m3u8%3Ftoken%3DSkQuhAXZxgBan1&id=tsports-new-4&exp=1782817724&s=5d2b538229908978cff29871dcc36e6e07dfbb52145dbc2270c64c745f524944", lang: "BAN/ENG", status: "online" },
-        { name: "SKY SPORTS MAIN EVENT", url: "https://smartbox.digital/stream-load/SKY%20SPORTS%20MAIN%20EVENT%20HD/playlist.m3u8", lang: "ENG", status: "online" },
-        { name: "SKY SPORTS FOOTBALL", url: "https://smartbox.digital/stream-load/skysports_football/playlist.m3u8", lang: "ENG", status: "online" },
-        { name: "SKY SPORTS CRICKET", url: "https://smartbox.digital/stream-load/skycricket/playlist.m3u8", lang: "ENG", status: "online" },
-        { name: "SKY SPORTS F1", url: "https://xstm.250909.cc/live/SPORTSFLUX-POOL-20acb0a9c8/5ffe6c552a88/1037.m3u8", lang: "ENG", status: "online" },
-        { name: "ESPN", url: "https://1nyaler.streamhostingcdn.top/stream/97/index.m3u8", lang: "DUT", status: "offline" }, 
-        { name: "TAPMAD", url: "https://seriealeague.akamaized.net/hls/live/2107107/tap-BK-PSL-D1-E/level_1.m3u8", lang: "DUT", status: "offline" },
-        { name: "beIN SPORTS 1", url: "https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8", lang: "FRE", status: "online" },
-        { name: "beIN SPORTS 1 MAX", url: "https://edge22.776740.ir.cdn.ir/hls2/sport.m3u8", lang: "ARA", status: "online" },
-        { name: "beIN SPORTS XTRA", url: "https://bein-esp-xumo.amagi.tv/playlistR1080p.m3u8", lang: "UNK", status: "online" },
-        { name: "DAZN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/52/index.m3u8", lang: "SPA", status: "online" },
-        { name: "DAZN F1", url: "https://tv.topmediatv.net:25463/live/TopMediaWeb/bOteTR8ED1/374.m3u8", lang: "SPA", status: "online" },
-        { name: "SKY SPORTS F1 UHD", url: "https://inproviszon.st/sky-sports-f1-uhd.m3u8", lang: "ENG", status: "offline" },
-        { name: "FOX SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/26/index.m3u8", lang: "ENG", status: "online" },
-        { name: "FOX", url: "https://d1jzu95oc8fgt3.cloudfront.net/FOX_Sports720p.m3u8", lang: "ENG", status: "online" },
-        { name: "D SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", lang: "ENG", status: "online" },
-        { name: "TSN 1", url: "https://pub-098b280041274cf5929f5e19cfc8ac67.r2.dev/en1/index.m3u8", lang: "ENG", status: "offline" },
-        { name: "TOFFEE", url: "https://sm-monirul.top/tof/live/toffee4/index.m3u8", lang: "ENG", status: "offline" }, 
-        { name: "WIN SPORTS", url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", lang: "SPA", status: "online" },
-        { name: "SPORT TV", url: "https://1nyaler.streamhostingcdn.top/stream/33/index.m3u8", lang: "SPA", status: "online" },
-        { name: "koora city", url: "https://am.homom.store/braz1_480/index.m3u8", lang: "weird lang?", status: "offline" }
-    ];
+const channels = [
+    { 
+        name: "T SPORTS", 
+        url: "https://smartbox.digital/stream/T-SPORTS/playlist.m3u8", 
+        backup: "https://tvsen7.aynaott.com/tsports-hd/index.m3u8", 
+        lang: "BAN/ENG", 
+        status: "online" 
+    },
+    { 
+        name: "SKY SPORTS MAIN EVENT", 
+        url: "https://smartbox.digital/stream-load/SKY%20SPORTS%20MAIN%20EVENT%20HD/playlist.m3u8", 
+        backup: "https://sjncvuaq.xyz/live.php?id=3b5045fa18313cd0&token=guest__c3c01MkWntSHywIXfy5hBD06vjdF8sNC7QdYwuzvkP4_SVvsg916N4jFfYa8PLfJy3MJYTxn2TD2I8m2hnHI8hVIbGAXuJrs2jMlD7XQv15fhb61KASilCHcKkLsdhlo5pn_q6nm8UUhLmMr5cIQa5VrdTKwvRcWrAbhCeF2XdwNxWNC56KRL64ECAa5M2Jzd3ucZDKqNMw4AH6EReoO_klMN5_fyLFoiDYgAqMH6bI-cNjeB0_vJR9NB3NwwO8ozHp3&format=.m3u8", 
+        lang: "ENG", 
+        status: "online" 
+    },
+    { 
+        name: "SKY SPORTS FOOTBALL", 
+        url: "https://smartbox.digital/stream-load/skysports_football/playlist.m3u8", 
+        backup: "https://sjncvuaq.xyz/live.php?id=e7013f2ad52a12cd&token=guest__6d79Tq5JvyauthP2k57ps1bdQ3gRRMcdZrxqc1jGrMHFi6LR7TgVXjc0Y0PjZjjlvMKItfCkzdnonoWVvR6D7deCENUNjhkOjJcOS7HJwwz20S_BEk-cPa6eq9HnKfNKFAd3syvceHIqRrJA_-QcIOP6RqdDZxwIztdmfYVJgPpIEyIhKeaQ3gXtH4T31xHnWQSLOrJp25q6DNObdzoJ7AQSVsxwF9huEWyf4HeU1p1qWYOWVzYViOXZZlw-NgCZVlB-&format=.m3u8", 
+        lang: "ENG", 
+        status: "online" 
+    },
+    { 
+        name: "SKY SPORTS CRICKET", 
+        url: "https://smartbox.digital/stream-load/skycricket/playlist.m3u8", 
+        backup: "https://sjncvuaq.xyz/live.php?id=52a8e378c691d89e&token=guest__1007zVr7Gv5Of5RBcWK83UTtNN75EBNU9VivSEByTxfUdNFByotns9sEFwl-q3ZthZwZ54r4rysrTRbRZf6DEdS_slxvEPjQsZsBtaK_-AQku6rdX5VcfSx1tmX_Q0AtpRu72QyDrCQO7g4LNAAB8hJuxMbj1l_E8p8j2x4UaOts_uWaqU5eW4xMuSSdcZFEC7fVwvJC5MFkvu15Txpp0Y7uJH_dz_hCL9sf_PBtH0A04y6KWemTDT3yG8_k0xI3UvRf&format=.m3u8", 
+        lang: "ENG", 
+        status: "online" 
+    },
+    { 
+        name: "SKY SPORTS F1", 
+        url: "https://xstm.250909.cc/live/SPORTSFLUX-POOL-20acb0a9c8/5ffe6c552a88/1037.m3u8", 
+        backup: "https://sjncvuaq.xyz/live.php?id=20d9a608e5c90f90&token=guest__1c964Ita_zPIiiEhyal4MMWURjng9y-w3V1ih2NeYK0xcN-KN5ih2NXUepUd8-ogxsgkspq3_305lV4Xd0vvD46b6MZBT6JmrU2cMi2KgGnCl9cZ7JqjGA6Nb3PR5hWy79hHsLqV9k1xS7nT2q8qiodZkMJB1YWYFm4IISkH8FRBbX5WA2WdrjMGEsZMioLqbpQPEPL-18_I94wvR0JJmroxDpne4K7YeSvUuDy-p1FApJm4s8ogBZFMuD0Ynq56NSGN&format=.m3u8", 
+        lang: "ENG", 
+        status: "online" 
+    },
+    { 
+        name: "ESPN", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/97/index.m3u8", 
+        backup: "https://backup-espn.m3u8", 
+        lang: "DUT", 
+        status: "offline" 
+    }, 
+    { 
+        name: "beIN SPORTS 1", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8", 
+        backup: "https://backup-bein1.m3u8", 
+        lang: "FRE", 
+        status: "online" 
+    },
+    { 
+        name: "beIN SPORTS 1 MAX", 
+        url: "https://edge22.776740.ir.cdn.ir/hls2/sport.m3u8", 
+        backup: "https://backup-beinmax.m3u8", 
+        lang: "ARA", 
+        status: "online" 
+    },
+    { 
+        name: "beIN SPORTS XTRA", 
+        url: "https://bein-esp-xumo.amagi.tv/playlistR1080p.m3u8", 
+        backup: "https://backup-beinxtra.m3u8", 
+        lang: "UNK", 
+        status: "online" 
+    },
+    { 
+        name: "DAZN SPORTS", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/52/index.m3u8", 
+        backup: "https://backup-dazn.m3u8", 
+        lang: "SPA", 
+        status: "online" 
+    },
+    { 
+        name: "DAZN F1", 
+        url: "https://tv.topmediatv.net:25463/live/TopMediaWeb/bOteTR8ED1/374.m3u8", 
+        backup: "https://backup-daznf1.m3u8", 
+        lang: "SPA", 
+        status: "online" 
+    },
+    { 
+        name: "SKY SPORTS F1 UHD", 
+        url: "https://inproviszon.st/sky-sports-f1-uhd.m3u8", 
+        backup: "https://backup-skyuhd.m3u8", 
+        lang: "ENG", 
+        status: "offline" 
+    },
+    { 
+        name: "FOX SPORTS", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/26/index.m3u8", 
+        backup: "https://backup-foxsports.m3u8", 
+        lang: "ENG", 
+        status: "online" 
+    },
+    { 
+        name: "FOX", 
+        url: "https://d1jzu95oc8fgt3.cloudfront.net/FOX_Sports720p.m3u8", 
+        backup: "https://backup-fox.m3u8", 
+        lang: "ENG", 
+        status: "online" 
+    },
+    { 
+        name: "D SPORTS", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", 
+        backup: "https://backup-dsports.m3u8", 
+        lang: "ENG", 
+        status: "online" 
+    },
+    { 
+        name: "TSN 1", 
+        url: "https://pub-098b280041274cf5929f5e19cfc8ac67.r2.dev/en1/index.m3u8", 
+        backup: "https://backup-tsn1.m3u8", 
+        lang: "ENG", 
+        status: "offline" 
+    },
+    { 
+        name: "TOFFEE", 
+        url: "https://sm-monirul.top/tof/live/toffee4/index.m3u8", 
+        backup: "https://backup-toffee.m3u8", 
+        lang: "ENG", 
+        status: "offline" 
+    }, 
+    { 
+        name: "WIN SPORTS", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", 
+        backup: "https://backup-winsports.m3u8", 
+        lang: "SPA", 
+        status: "online" 
+    },
+    { 
+        name: "SPORT TV", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/33/index.m3u8", 
+        backup: "https://backup-sporttv.m3u8", 
+        lang: "SPA", 
+        status: "online" 
+    },
+    { 
+        name: "koora city", 
+        url: "https://am.homom.store/braz1_480/index.m3u8", 
+        backup: "https://backup-koora.m3u8", 
+        lang: "weird lang?", 
+        status: "offline" 
+    }
+];
 
     const grid = document.getElementById('channel-grid');
     channels.forEach(c => {
