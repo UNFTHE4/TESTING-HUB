@@ -867,8 +867,7 @@ const channels = [
         backup: "https://lb14.strmd.st/secure/knqedGyKafAwaQVHthQZpjwOJuEOWHUA/rtmp/stream/DrdlDDT8cVK-oHNuShmZXRLtpskSxBlaw4Wzhf8MqB90F8tRA9uv1S-QNUayEMtRQ1SdMN9siRl84Dg/1/playlist.m3u8", 
         lang: "ENG", 
         status: "offline",
-        ageRestricted: false
-    },
+        ageRestricted: false    },
     { 
         name: "WIN SPORTS", 
         url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", 
@@ -943,7 +942,7 @@ const channels = [
         channels.forEach((c, index) => {
             let card = document.createElement('div');
             const savedAge = localStorage.getItem('unf_age');
-            let isRestricted = c.ageRestricted && savedAge && parseInt(savedAge) < 18;
+            let isRestricted = c.ageRestricted && (!savedAge || parseInt(savedAge) < 18);
             
             // If restricted, DO NOT add card to grid at all
             if (isRestricted) return;
@@ -979,12 +978,12 @@ const channels = [
         }, 1500);
     }
 
-    // ===== CHANNELS GRID GENERATION =====
+    // ===== CHANNELS GRID GENERATION (On Load) =====
     const grid = document.getElementById('channel-grid');
     channels.forEach((c, index) => {
         let card = document.createElement('div');
         const savedAge = localStorage.getItem('unf_age');
-        let isRestricted = c.ageRestricted && savedAge && parseInt(savedAge) < 18;
+        let isRestricted = c.ageRestricted && (!savedAge || parseInt(savedAge) < 18);
 
         // If restricted, DO NOT add card to grid at all
         if (isRestricted) return;
