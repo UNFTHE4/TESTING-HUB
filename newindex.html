@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <title>UNF STREAM HUB</title>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/webp" href="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
+    
+    <!-- ===== GOOGLE CAST SDK ===== -->
+    <script src="https://www.gstatic.com/cv/js/sender/latest/cast_sender.js"></script>
+
+    <style>
+        /* ===== RESET ===== */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:#0b0c10; font-family:sans-serif; color:#fff; overflow-x:hidden; min-height:100vh; }
+        :root { --mint: #00ff66; --panel: #11141a; --red: #ff4757; }
+
+        /* ===== WELCOME SCREEN ===== */
+        #welcome-screen {
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: url("https://i.ibb.co.com/vvCwyJG5/WC-1.png") center/cover no-repeat;
+            background-color: #0b0c10;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .welcome-box {
+            background: linear-gradient(135deg, #000, #00ff6611);
+            padding: 40px 30px;
+            border: 2px solid var(--mint);
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .logo-img {
+            width: 120px;
+            height: auto;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+        .welcome-box h1 {
+            color: var(--mint);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        .welcome-box p {
+            color: #889;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        #passcode-input {
+            background: transparent;
+            border: 2px solid var(--mint);
+            color: var(--mint);
+            padding: 12px;
+            font-size: 1.5rem;
+            text-align: center;
+            width: 120px;
+            letter-spacing: 8px;
+            border-radius: 8px;
+            outline: none;
+        }
+        #passcode-input:focus { box-shadow: 0 0 15px rgba(0,255,102,0.3); }
+        #login-error {
+            color: var(--red);
+            margin-top: 12px;
+            font-weight: bold;
+            display: none;
+        }
+        .login-footer {
+            margin-top: 15px;
+            color: #556;
+            font-size: 0.75rem;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        #main-content {
+            display: none;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 10px 20px;
+        }
+
+        /* ===== VIDEO HEADER ===== */
+        #video-header {
+            background: #000;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        /* ===== VIDEO PLAYER AREA ===== */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            overflow: hidden;
+        }
+        #player {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: #000;
+        }
+
+        /* ===== CUSTOM IMAGE ONLY INSIDE VIDEO PLAYER ===== */
+        #unf-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("https://i.ibb.co.com/PsmG206D/VIDEOPLAYER-ART.png") center/cover no-repeat;
+            background-color: #0b0c10;
+            z-index: 0;
+            pointer-events: none;
+            display: block;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            border-bottom: 2px solid var(--mint);
+        }
+        .top-bar .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-bar .logo img {
+            height: 40px;
+            width: auto;
+            border-radius: 6px;
+        }
+        .top-bar .logo span {
+            color: var(--mint);
+            font-weight: bold;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+        .top-bar .right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        #digital-clock {
+            color: var(--mint);
+            font-family: monospace;
+            font-size: 1rem;
+            background: rgba(0,0,0,0.5);
+            padding: 4px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--mint);
+        }
+        @media (max-width: 899px) {
+            #digital-clock { display: none; }
+        }
+
+        /* ===== MENU ===== */
+        #menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 70px;
+            right: 15px;
+            background: #11141a;
+            border: 1px solid var(--mint);
+            border-radius: 12px;
+            padding: 10px 0;
+            width: 180px;
+            z-index: 2000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+        #menu-dropdown div {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #222;
+            color: #fff;
+            transition: 0.2s;
+        }
+        #menu-dropdown div:hover {
+            background: rgba(0, 255, 102, 0.1);
+            color: var(--mint);
+        }
+        #menu-dropdown div:last-child {
+            border-bottom: none;
+        }
+        #menu-dropdown div:last-child:hover {
+            background: rgba(255, 71, 87, 0.1);
+            color: var(--red);
+        }
+
+        /* ===== CONTROLS ===== */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.8);
+            color: var(--mint);
+        }
+        .controls i {
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: 0.2s;
+        }
+        .controls i:hover { color: #fff; }
+        .controls .left, .controls .right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        #status-text {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* ===== OVERLAYS ===== */
+        #status-overlay {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 99;
+            pointer-events: none;
+            text-align: center;
+        }
+        #buffer-gif {
+            display: none;
+            width: 100px;
+        }
+        #error-msg {
+            display: none;
+            color: white;
+            background: rgba(0,0,0,0.8);
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+
+        /* ===== GRID ===== */
+        .grid {
+            display: grid;
+            gap: 10px;
+            padding: 15px 0;
+        }
+        .card {
+            background: var(--panel);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            color: #fff;
+            transition: all 0.2s ease;
+        }
+        .card.active {
+            border-color: var(--mint);
+            background: #1a2a3a;
+            box-shadow: 0 0 15px rgba(0,255,102,0.3);
+            transform: scale(1.02);
+        }
+        .card.offline {
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+        .card.starting-soon {
+            opacity: 0.7;
+            border-color: #ffaa00;
+        }
+        .online-text { color: var(--mint); font-weight: bold; }
+        .offline-text { color: var(--red); font-weight: bold; }
+        .starting-soon-text { color: #ffaa00; font-weight: bold; }
+
+        @media (max-width: 899px) {
+            .grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (min-width: 900px) {
+            .grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* ===== ADJUST PANEL ===== */
+        #adjust-panel {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+            background: #111;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--mint);
+            display: none;
+            z-index: 1000;
+        }
+        #adjust-panel div {
+            margin-bottom: 10px;
+        }
+        #adjust-panel input {
+            width: 100%;
+        }
+
+        /* ===== DEADSIMPLECHAT ===== */
+        #chat-overlay {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            background: transparent;
+            pointer-events: none;
+        }
+
+        #chat-overlay iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: auto;
+            border-radius: 12px;
+            background: #11141a;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.8);
+        }
+
+        /* Desktop: floating on the left */
+        @media (min-width: 900px) {
+            #chat-overlay {
+                top: 120px;
+                left: 20px;
+                width: 320px;
+                height: 400px;
+                border-radius: 12px;
+            }
+        }
+
+        /* Mobile: bottom half of screen */
+        @media (max-width: 899px) {
+            #chat-overlay {
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 50vh;
+                border-radius: 16px 16px 0 0;
+            }
+            #chat-overlay iframe {
+                border-radius: 16px 16px 0 0;
+            }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            padding: 30px 10px;
+            margin-top: 20px;
+            border-top: 1px solid #222;
+        }
+
+        /* ===== REQUEST MOVIE OVERLAY ===== */
+        #request-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+        }
+        .request-box {
+            background: #11141a;
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--mint);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .request-box h2 {
+            color: var(--mint);
+            margin-bottom: 10px;
+        }
+        .request-box p {
+            color: #889;
+            margin-bottom: 15px;
+        }
+        .request-box input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #0b0c10;
+            color: #fff;
+        }
+        .request-box button {
+            width: 100%;
+            padding: 12px;
+            background: var(--mint);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .request-box button:hover {
+            background: #00dd55;
+        }
+        .request-box .cancel-btn {
+            margin-top: 10px;
+            background: transparent;
+            border: 1px solid #555;
+            color: #889;
+        }
+        .request-box .cancel-btn:hover {
+            background: #222;
+        }
+        #request-status {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        /* ===== SETTINGS OVERLAY ===== */
+        #settings-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+        }
+        .settings-box {
+            background: #11141a;
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--mint);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .settings-box h2 {
+            color: var(--mint);
+            margin-bottom: 15px;
+        }
+        .settings-box label {
+            display: block;
+            text-align: left;
+            color: #ccc;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        .settings-box select, .settings-box input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #0b0c10;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        .settings-box select:focus, .settings-box input:focus {
+            border-color: var(--mint);
+            outline: none;
+        }
+        .settings-box button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: var(--mint);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .settings-box button:hover {
+            background: #00dd55;
+        }
+        .settings-box .close-btn {
+            margin-top: 10px;
+            background: transparent;
+            border: 1px solid #555;
+            color: #889;
+        }
+        .settings-box .close-btn:hover {
+            background: #222;
+        }
+        #settings-status {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== WELCOME SCREEN ===== -->
+<div id="welcome-screen">
+    <div class="welcome-box">
+        <img class="logo-img" src="https://i.ibb.co.com/Df6zYZTZ/Adobe-Express-file.png" alt="UNF Logo">
+        <h1>UNF STREAM HUB</h1>
+        <p>United NTLA of Flario<br><span style="color:#667;font-size:0.75rem;">Enter 4-digit passcode</span></p>
+        <input id="passcode-input" type="password" maxlength="4" placeholder="****" inputmode="numeric" autofocus>
+        <div id="login-error">❌ Incorrect passcode!</div>
+        <div class="login-footer">For citizens of Flario only</div>
+    </div>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div id="main-content">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div class="logo">
+            <img src="https://i.ibb.co.com/0yFrNTmv/UNF-DESIGN-20260123-224445-0001.webp" alt="UNF Logo">
+            <span>UNF</span>
+        </div>
+        <div class="right">
+            <i class="fa-solid fa-bars" onclick="toggleMenu()" style="cursor:pointer; font-size:1.4rem; color:var(--mint);"></i>
+            <div id="digital-clock">00:00 AM</div>
+        </div>
+    </div>
+
+    <!-- MENU DROPDOWN -->
+    <div id="menu-dropdown">
+        <div onclick="playMovie()">🎬 Movie Player</div>
+        <div onclick="openRequestMovie()">🎞️ Request Movie</div>
+        <div onclick="reportError()">🚨 Report Error</div>
+        <div onclick="openSettings()">⚙️ Settings</div>
+    </div>
+
+    <!-- VIDEO HEADER -->
+    <div id="video-header">
+
+        <!-- VIDEO WRAPPER (locks image inside 16:9 area) -->
+        <div class="video-wrapper">
+            <!-- CUSTOM IMAGE ONLY INSIDE VIDEO PLAYER AREA -->
+            <div id="unf-placeholder"></div>
+            <video id="player" playsinline></video>
+        </div>
+
+        <div id="status-overlay">
+            <img id="buffer-gif" src="https://media4.giphy.com/media/aBW9YyswmydvlKf7ZU/giphy.gif">
+            <div id="error-msg">IF STREAM IS NOT WORKING PLEASE REPORT AND LET US KNOW</div>
+        </div>
+
+        <div class="controls">
+            <div class="left">
+                <i class="fa-solid fa-play" onclick="vid.play()"></i>
+            </div>
+            <span id="status-text">SELECT CHANNEL</span>
+            <div class="right">
+                <i class="fa-solid fa-comment-dots" onclick="toggleChat()" style="cursor:pointer; color:var(--mint);"></i>
+                <i class="fa-solid fa-sliders" onclick="togglePanel()"></i>
+                <i class="fa-solid fa-volume-up" id="vol-icon" onclick="toggleMute()"></i>
+                <i class="fa-solid fa-expand" onclick="goFullscreen()"></i>
+                <i class="fa-solid fa-chromecast" id="castButton" onclick="startCasting()" style="cursor:pointer; display:none; color:#fff;"></i>
+            </div>
+        </div>
+        <div id="adjust-panel">
+            <div>Saturation: <input max="200" min="0" oninput="applyFilter()" type="range" value="100"></div>
+            <div>Contrast: <input max="150" min="50" oninput="applyFilter()" type="range" value="100"></div>
+            <div>Sharpness: <input max="100" min="0" oninput="applyFilter()" type="range" value="0"></div>
+        </div>
+        <div class="grid" id="channel-grid"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        All RIGHTS OF THIS SITE OWN BY UNF STREAM HUB SERVICE. ITS USE TO BROADCAST ALL PUBLICALLY AVAILABLE STREAM WE FOUND ONLINE ©
+    </div>
+</div>
+
+<!-- ===== REQUEST MOVIE OVERLAY ===== -->
+<div id="request-overlay">
+    <div class="request-box">
+        <h2>🎞️ Request a Movie</h2>
+        <p>Enter the name of the movie you want to watch</p>
+        <input id="movie-title" type="text" placeholder="Movie Title">
+        <button onclick="saveMovieRequest()">✅ Request Movie</button>
+        <button class="cancel-btn" onclick="document.getElementById('request-overlay').style.display='none'">Cancel</button>
+        <div id="request-status"></div>
+    </div>
+</div>
+
+<!-- ===== SETTINGS OVERLAY ===== -->
+<div id="settings-overlay">
+    <div class="settings-box">
+        <h2>⚙️ Settings</h2>
+
+        <label for="resolution-select">Video Resolution</label>
+        <select id="resolution-select">
+            <option value="low">Low (480p)</option>
+            <option value="auto" selected>Auto</option>
+            <option value="high">High (1080p+)</option>
+        </select>
+
+        <label for="age-input">Age (for restricted content)</label>
+        <input type="number" id="age-input" placeholder="Enter your age" min="1" max="120">
+
+        <button onclick="saveSettings()">💾 Save Settings</button>
+        <button class="close-btn" onclick="document.getElementById('settings-overlay').style.display='none'">Close</button>
+        <div id="settings-status"></div>
+    </div>
+</div>
+
+<!-- ===== DEADSIMPLECHAT OVERLAY ===== -->
+<div id="chat-overlay">
+    <iframe src="https://deadsimplechat.com/_x5KSSXCX" allow="camera; microphone; fullscreen; autoplay"></iframe>
+</div>
+
+<script>
+    // ===== PASSCODE =====
+    function checkCode(val) {
+        if (val === "6767") {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('login-error').style.display = 'none';
+        } else if (val.length === 4) {
+            document.getElementById('login-error').style.display = 'block';
+            document.getElementById('passcode-input').value = '';
+        }
+    }
+
+    document.getElementById('passcode-input').addEventListener('input', function() {
+        checkCode(this.value);
+    });
+
+    // ===== VIDEO PLAYER =====
+    const vid = document.getElementById('player');
+    const s = document.querySelectorAll('#adjust-panel input');
+    let hls = null;
+    let tsnTimer = null;
+
+    function goFullscreen() {
+        if (vid.requestFullscreen) vid.requestFullscreen();
+    }
+
+    function applyFilter() {
+        vid.style.filter = `saturate(${s[0].value}%) contrast(${s[1].value}%) blur(${s[2].value/50}px)`;
+    }
+
+    function togglePanel() {
+        const p = document.getElementById('adjust-panel');
+        p.style.display = (p.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function toggleMute() {
+        vid.muted = !vid.muted;
+        document.getElementById('vol-icon').className = vid.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-up';
+    }
+
+    function playStream(url, name) {
+        // Hide placeholder
+        document.getElementById('unf-placeholder').style.display = 'none';
+
+        // Cleanup
+        if (hls) { hls.destroy(); hls = null; }
+        if (tsnTimer) { clearInterval(tsnTimer); tsnTimer = null; }
+
+        // Find the channel object so we can access its backup URL
+        const channel = channels.find(c => c.name === name);
+
+        // M3U8 Logic (HLS.js)
+        if (url.includes('.m3u8')) {
+            if (window.Hls && Hls.isSupported()) {
+                hls = new Hls({
+                    maxBufferLength: 500,
+                    backBufferLength: 10,
+                    xhrSetup: (xhr) => { xhr.setRequestHeader('User-Agent', 'Mozilla/5.0'); }
+                });
+                hls.loadSource(url);
+                hls.attachMedia(vid);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => { vid.play(); });
+
+                // ===== AUTO-SWITCH TO BACKUP ON ERROR =====
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        // If a backup exists and we haven't tried it yet
+                        if (channel && channel.backup && url !== channel.backup) {
+                            console.log("🔁 Main stream failed. Switching to backup...");
+                            playStream(channel.backup, name);
+                        } else {
+                            console.error("Stream failed and no backup available.");
+                            document.getElementById('error-msg').style.display = 'block';
+                        }
+                    }
+                });
+            } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+                vid.src = url;
+                vid.play();
+            }
+        }
+        // MP4 direct fallback
+        else if (url.includes('.mp4')) {
+            vid.src = url;
+            vid.play();
+        }
+        // Any other format
+        else {
+            vid.src = url;
+            vid.play();
+        }
+
+        // Special D SPORTS rotation
+        if (name === "D SPORTS") {
+            const links = [
+                "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", 
+                "https://fl1004.bozztv.com/ushba-mafia/tracks-v1a1/mono.m3u8"
+            ];
+            const interval = 180000;
+            tsnTimer = setInterval(() => {
+                const activeIndex = Math.floor(Date.now() / interval) % links.length;
+                if (hls && hls.url !== links[activeIndex]) {
+                    hls.loadSource(links[activeIndex]);
+                    hls.currentLevel = hls.levels.length - 1;
+                    vid.play();
+                }
+            }, 5000);
+        }
+    }
+
+    // ===== CHANNELS =====
+const channels = [
+    { 
+        name: "T SPORTS", 
+        url: "https://smartbox.digital/stream/T-SPORTS/playlist.m3u8", 
+        backup: "https://tvsen7.aynaott.com/tsports-hd/index.m3u8", 
+        lang: "BAN/ENG", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "SKY SPORTS MAIN EVENT", 
+        url: "https://smartbox.digital/stream-load/SKY%20SPORTS%20MAIN%20EVENT%20HD/playlist.m3u8", 
+        backup: "https://sjncvuaq.xyz/live.php?id=3b5045fa18313cd0&token=guest__c3c01MkWntSHywIXfy5hBD06vjdF8sNC7QdYwuzvkP4_SVvsg916N4jFfYa8PLfJy3MJYTxn2TD2I8m2hnHI8hVIbGAXuJrs2jMlD7XQv15fhb61KASilCHcKkLsdhlo5pn_q6nm8UUhLmMr5cIQa5VrdTKwvRcWrAbhCeF2XdwNxWNC56KRL64ECAa5M2Jzd3ucZDKqNMw4AH6EReoO_klMN5_fyLFoiDYgAqMH6bI-cNjeB0_vJR9NB3NwwO8ozHp3&format=.m3u8", 
+        lang: "ENG", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "SKY SPORTS FOOTBALL", 
+        url: "https://smartbox.digital/stream-load/skysports_football/playlist.m3u8", 
+        backup: "https://sjncvuaq.xyz/live.php?id=e7013f2ad52a12cd&token=guest__6d79Tq5JvyauthP2k57ps1bdQ3gRRMcdZrxqc1jGrMHFi6LR7TgVXjc0Y0PjZjjlvMKItfCkzdnonoWVvR6D7deCENUNjhkOjJcOS7HJwwz20S_BEk-cPa6eq9HnKfNKFAd3syvceHIqRrJA_-QcIOP6RqdDZxwIztdmfYVJgPpIEyIhKeaQ3gXtH4T31xHnWQSLOrJp25q6DNObdzoJ7AQSVsxwF9huEWyf4HeU1p1qWYOWVzYViOXZZlw-NgCZVlB-&format=.m3u8", 
+        lang: "ENG", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "SKY SPORTS CRICKET", 
+        url: "https://smartbox.digital/stream-load/skycricket/playlist.m3u8", 
+        backup: "https://am.homom.store/braz1_720/index.m3u8",
+        lang: "ENG", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "SKY SPORTS F1", 
+        url: "https://xstm.250909.cc/live/SPORTSFLUX-POOL-20acb0a9c8/5ffe6c552a88/1037.m3u8", 
+        backup: "https://inproviszon.st/sky-sports-f1-uhd.m3u8", 
+        lang: "ENG", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "ESPN", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/97/index.m3u8", 
+        backup: "https://backup-espn.m3u8", 
+        lang: "DUT", 
+        status: "offline",
+        ageRestricted: false
+    }, 
+    { 
+        name: "beIN SPORTS 1", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8", 
+        backup: "https://edge22.776740.ir.cdn.ir/hls2/sport.m3u8", 
+        lang: "FRE", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "beIN SPORTS 1 MAX", 
+        url: "https://edge22.776740.ir.cdn.ir/hls2/sport.m3u8", 
+        backup: "https://am.homom.store/braz1_720/index.m3u8", 
+        lang: "ARA", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "beIN SPORTS XTRA", 
+        url: "https://bein-esp-xumo.amagi.tv/playlistR1080p.m3u8", 
+        backup: "https://bein-esp-xumo.amagi.tv/playlistR1080p.m3u8", 
+        lang: "UNK", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "DAZN SPORTS", 
+        url: "https://lb10.strmd.st/secure/RqQAGSJKynzSRgdNaTcaSVJoakOBAKew/rtmp/stream/goDobWTHeyGmXo9rNGt_Xgij7bTugZBuJeNKVupDGEMvNzXBNRTWoc1F1M3PczdezkTC0AkERmCB9QhB/1/playlist.m3u8", 
+        backup: "https://1nyaler.streamhostingcdn.top/stream/52/index.m3u8", 
+        lang: "SPA", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "DAZN F1", 
+        url: "https://tv.topmediatv.net:25463/live/TopMediaWeb/bOteTR8ED1/374.m3u8", 
+        backup: "https://backup-daznf1.m3u8", 
+        lang: "SPA", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "SKY SPORTS F1 UHD", 
+        url: "https://inproviszon.st/sky-sports-f1-uhd.m3u8", 
+        backup: "https://backup-skyuhd.m3u8", 
+        lang: "ENG", 
+        status: "offline",
+        ageRestricted: false
+    },
+    { 
+        name: "FOX SPORTS", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/26/index.m3u8", 
+        backup: "https://backup-foxsports.m3u8", 
+        lang: "ENG", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "FOX", 
+        url: "https://d1jzu95oc8fgt3.cloudfront.net/FOX_Sports720p.m3u8", 
+        backup: "https://backup-fox.m3u8", 
+        lang: "ENG", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "D SPORTS", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/106/index.m3u8", 
+        backup: "https://backup-dsports.m3u8", 
+        lang: "ENG", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "TSN 1", 
+        url: "https://pub-098b280041274cf5929f5e19cfc8ac67.r2.dev/en1/index.m3u8", 
+        backup: "https://lb14.strmd.st/secure/knqedGyKafAwaQVHthQZpjwOJuEOWHUA/rtmp/stream/DrdlDDT8cVK-oHNuShmZXRLtpskSxBlaw4Wzhf8MqB90F8tRA9uv1S-QNUayEMtRQ1SdMN9siRl84Dg/1/playlist.m3u8", 
+        lang: "ENG", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "UNITE8 SPORTS 1", 
+        url: "http://103.89.248.26:8082/FIFA-World-Cup-Live/tracks-a1/index.fmp4.m3u8", 
+        backup: "https://backup-toffee.m3u8", 
+        lang: "ENG", 
+        status: "online",
+        ageRestricted: false
+    }, 
+    { 
+        name: "WIN SPORTS", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8", 
+        backup: "https://backup-winsports.m3u8", 
+        lang: "SPA", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "SPORT TV", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/33/index.m3u8", 
+        backup: "https://backup-sporttv.m3u8", 
+        lang: "SPA", 
+        status: "online",
+        ageRestricted: false
+    },
+    { 
+        name: "koora city", 
+        url: "https://am.homom.store/braz1_480/index.m3u8", 
+        backup: "https://backup-koora.m3u8", 
+        lang: "weird lang?", 
+        status: "offline",
+        ageRestricted: false
+    },
+    // ===== AGE-RESTRICTED CHANNEL EXAMPLE =====
+    { 
+        name: "🔞 ADULT SPORTS (18+)", 
+        url: "https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8", 
+        backup: "https://backup-adult.m3u8", 
+        lang: "18+", 
+        status: "online",
+        ageRestricted: true 
+    }
+];
+
+    // ===== SETTINGS: LOAD FROM LOCALSTORAGE ON START =====
+    function loadSettings() {
+        const savedRes = localStorage.getItem('unf_resolution');
+        if (savedRes) {
+            document.getElementById('resolution-select').value = savedRes;
+        }
+
+        const savedAge = localStorage.getItem('unf_age');
+        if (savedAge) {
+            document.getElementById('age-input').value = savedAge;
+            applyAgeRestriction(parseInt(savedAge));
+        }
+    }
+
+    // ===== SETTINGS: OPEN SETTINGS OVERLAY =====
+    function openSettings() {
+        document.getElementById('menu-dropdown').style.display = 'none';
+        document.getElementById('settings-status').innerText = '';
+        document.getElementById('settings-overlay').style.display = 'flex';
+    }
+
+    // ===== SETTINGS: SAVE SETTINGS =====
+    function saveSettings() {
+        const resolution = document.getElementById('resolution-select').value;
+        const age = document.getElementById('age-input').value.trim();
+
+        if (!age) {
+            document.getElementById('settings-status').innerText = '❌ Please enter your age.';
+            document.getElementById('settings-status').style.color = 'var(--red)';
+            return;
+        }
+
+        localStorage.setItem('unf_resolution', resolution);
+        localStorage.setItem('unf_age', age);
+
+        applyAgeRestriction(parseInt(age));
+
+        document.getElementById('settings-status').innerText = '✅ Settings saved!';
+        document.getElementById('settings-status').style.color = 'var(--mint)';
+
+        setTimeout(() => {
+            document.getElementById('settings-overlay').style.display = 'none';
+        }, 1500);
+    }
+
+    // ===== SETTINGS: APPLY AGE RESTRICTION =====
+    function applyAgeRestriction(age) {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            const channel = channels[index];
+            if (channel && channel.ageRestricted) {
+                if (age < 18) {
+                    card.classList.add('offline');
+                    card.style.cursor = 'not-allowed';
+                    card.onclick = null;
+                    // Change status text visually (optional)
+                    const statusSpan = card.querySelector('.offline-text, .online-text');
+                    if (statusSpan) {
+                        statusSpan.innerText = 'RESTRICTED';
+                        statusSpan.className = 'offline-text';
+                    }
+                } else {
+                    card.classList.remove('offline');
+                    card.style.cursor = 'pointer';
+                    // Restore click functionality
+                    card.onclick = () => {
+                        if (channels[index].status === "online" && channels[index].url) {
+                            document.querySelectorAll('.card').forEach(el => el.classList.remove('active'));
+                            card.classList.add('active');
+                            document.getElementById('status-text').innerText = channels[index].name;
+                            playStream(channels[index].url, channels[index].name);
+                        }
+                    };
+                    // Restore status text
+                    const statusSpan = card.querySelector('.offline-text, .online-text');
+                    if (statusSpan) {
+                        statusSpan.innerText = 'ONLINE';
+                        statusSpan.className = 'online-text';
+                    }
+                }
+            }
+        });
+    }
+
+    // ===== LOAD SETTINGS ON PAGE LOAD =====
+    document.addEventListener('DOMContentLoaded', loadSettings);
+
+    // ===== CHANNELS GRID GENERATION =====
+    const grid = document.getElementById('channel-grid');
+    channels.forEach((c, index) => {
+        let card = document.createElement('div');
+        // If age is already saved and user is under 18, mark as offline
+        const savedAge = localStorage.getItem('unf_age');
+        let isRestricted = c.ageRestricted && savedAge && parseInt(savedAge) < 18;
+        let statusClass = isRestricted ? 'offline' : c.status;
+        
+        card.className = `card ${statusClass}`;
+        if (isRestricted) {
+            card.style.cursor = 'not-allowed';
+        }
+
+        let statusText = isRestricted ? 'RESTRICTED' : c.status.toUpperCase();
+        let statusClassText = isRestricted ? 'offline-text' : `${c.status}-text`;
+
+        card.innerHTML = `
+            <div style="font-weight:bold;">${c.name}</div>
+            <div style="font-size:0.7rem; color:#ccc;">${c.lang}</div>
+            <div class="${statusClassText}">${statusText}</div>
+        `;
+
+        if (!isRestricted) {
+            card.onclick = () => {
+                if (c.status === "online" && c.url) {
+                    document.querySelectorAll('.card').forEach(el => el.classList.remove('active'));
+                    card.classList.add('active');
+                    document.getElementById('status-text').innerText = c.name;
+                    playStream(c.url, c.name);
+                }
+            };
+        }
+        grid.appendChild(card);
+    });
+
+    // ===== VIDEO EVENTS =====
+    const gif = document.getElementById('buffer-gif');
+    const err = document.getElementById('error-msg');
+
+    vid.addEventListener('waiting', () => { gif.style.display = 'block'; });
+    vid.addEventListener('playing', () => { gif.style.display = 'none'; err.style.display = 'none'; });
+    vid.addEventListener('error', () => { gif.style.display = 'none'; err.style.display = 'block'; });
+
+    // ===== DIGITAL CLOCK =====
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+        document.getElementById('digital-clock').innerText = timeString;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ===== MENU FUNCTIONS =====
+    function toggleMenu() {
+        const menu = document.getElementById('menu-dropdown');
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+
+    // ===== MOVIE SYSTEM =====
+    const movieList = [
+        { name: "THE MOVIE", url: "http://cinehub24.com/ftp/Movies/hollywood/2011/Johnny%20English%20Reborn%20%282011%29/Johnny%20English%20Reborn%20%282011%29.mp4" }
+    ];
+
+    function playMovie() {
+        document.getElementById('menu-dropdown').style.display = 'none';
+        if (movieList.length === 0) {
+            alert("🎬 No movie has been added by the admin yet. Check back later!");
+            return;
+        }
+        const movie = movieList[0];
+        document.getElementById('status-text').innerText = `🎬 ${movie.name}`;
+        playStream(movie.url, movie.name);
+    }
+
+    function openRequestMovie() {
+        document.getElementById('menu-dropdown').style.display = 'none';
+        document.getElementById('request-overlay').style.display = 'flex';
+    }
+
+    function saveMovieRequest() {
+        const title = document.getElementById('movie-title').value.trim();
+        if (!title) return;
+        const email = "UNF.INT@proton.me";
+        const subject = encodeURIComponent("New Movie Request");
+        const body = encodeURIComponent("I would like to request the movie: " + title);
+        window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        document.getElementById('request-overlay').style.display = 'none';
+    }
+    
+    function reportError() {
+        document.getElementById('menu-dropdown').style.display = 'none';
+        const email = 'UNF.INT@proton.me';
+        const subject = encodeURIComponent('UNF Hub - Error Report');
+        const body = encodeURIComponent('Please describe the error you encountered:\n\n');
+        window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+    }
+
+    // ===== CHAT FUNCTIONS =====
+    function toggleChat() {
+        const overlay = document.getElementById('chat-overlay');
+        overlay.style.display = (overlay.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('menu-dropdown');
+        const icon = document.querySelector('.fa-bars');
+        if (menu.style.display === 'block' && !menu.contains(e.target) && !icon.contains(e.target)) {
+            menu.style.display = 'none';
+        }
+    });
+</script>
+
+</body>
+</html>
